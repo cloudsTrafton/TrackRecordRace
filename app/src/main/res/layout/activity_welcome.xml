@@ -27,4 +27,13 @@
         android:layout_centerInParent="true"
         android:text="@string/LogoutBtn" />
 
+    <Button
+        android:id="@+id/openMap"
+        android:layout_below="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="go to map" />
+
+
 </RelativeLayout>

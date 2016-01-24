@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.seniorproject.trafton.trackrecordrace.ProfileFragment">
+
+
+    <TextView
+        android:id="@+id/txtuser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="50dp"
+        android:paddingBottom="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+    <TextView
+        android:id="@+id/runuser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Number of Runs: "
+        android:layout_below="@+id/txtwelcome"
+        android:paddingTop="50dp"
+        android:layout_centerHorizontal="true" />
+    <TextView
+        android:id="@+id/raceuser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Number of Races: "
+        android:layout_below="@+id/runuser"
+        android:paddingTop="50dp"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

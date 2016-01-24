@@ -3,6 +3,11 @@ package com.seniorproject.trafton.trackrecordrace;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -14,7 +19,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
-public class RegisterActivity extends Activity {
+public class RegisterActivity extends AppCompatActivity {
 
     //variables for user data
     Button registerButton;
@@ -22,25 +27,31 @@ public class RegisterActivity extends Activity {
     String usernametxt;
     String passwordtxt;
     String weighttxt;
+    String phoneNumtxt;
     int weightNum;
+    int phoneNum;
     String gender;
     Boolean genderEntered;
 
     EditText password;
     EditText username;
     EditText weight;
+    EditText pNumber;
 
     CheckBox male;
     CheckBox female;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+
         //wire up widgets
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
+        pNumber = (EditText) findViewById(R.id.phone_number);
         weight = (EditText) findViewById(R.id.weight);
         male = (CheckBox) findViewById(R.id.cb_male);
         female = (CheckBox) findViewById(R.id.cb_female);
@@ -58,13 +69,19 @@ public class RegisterActivity extends Activity {
 
                 // Retrieve the information from the user registration form
                 usernametxt = username.getText().toString();
+
                 passwordtxt = password.getText().toString();
+
                 weighttxt = weight.getText().toString();
                 weightNum = Integer.parseInt(weighttxt);
 
+                phoneNumtxt = pNumber.getText().toString();
+                phoneNum = Integer.parseInt(phoneNumtxt);
+
+
                 //weight has to be between 0 and 999
                 // Force user to fill up the form
-                if (usernametxt.equals("") && passwordtxt.equals("") && weighttxt.equals("") && weightNum < 0 && genderEntered == false ) {
+                if (usernametxt.equals("") && passwordtxt.equals("") && phoneNumtxt.equals("") && weighttxt.equals("") && weightNum < 0 && genderEntered == false ) {
                     Toast.makeText(getApplicationContext(),
                             "Please complete the sign up form",
                             Toast.LENGTH_LONG).show();
@@ -74,6 +91,7 @@ public class RegisterActivity extends Activity {
                     ParseUser user = new ParseUser();
                     user.setUsername(usernametxt);
                     user.put("weight",weightNum);
+                    user.put("phoneNumber",phoneNum);
                     user.put("genderCode",gender);
                     user.setPassword(passwordtxt);
                     user.signUpInBackground(new SignUpCallback() {
