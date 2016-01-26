@@ -1,6 +1,7 @@
 package com.seniorproject.trafton.trackrecordrace;
 
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -65,6 +66,10 @@ public class MainTabsActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_run:
                 //Begin a new RunActivity
+               Intent intent = new Intent(
+                        MainTabsActivity.this,
+                        MapsActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.action_settings:
                 //begin a new ChangeSettingsActivity
