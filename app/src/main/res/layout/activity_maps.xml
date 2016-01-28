@@ -3,25 +3,139 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <ImageButton
-    android:id="@+id/go_button"
-    android:src = "@drawable/mr_ic_play_light"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"/>
 
-    <ImageButton
-        android:id="@+id/stop_button"
-        android:src = "@drawable/ic_pause_light"
-        android:layout_toRightOf="@id/go_button"
+
+    <RelativeLayout
+        android:id="@+id/run_stats"
+        android:layout_below="@id/map"
+        android:layout_margin="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+    <RelativeLayout
+        android:id="@+id/run_stats_text_left"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:gravity="left"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/run_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textSize="36sp"
+            android:layout_margin="5sp"
+            />
+        <TextView
+            android:id="@+id/run_time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/run_time_label"
+            android:text="0.0s"
+            android:textSize="24sp"
+            android:layout_margin="5sp"
+            />
+        <TextView
+            android:id="@+id/run_speed_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/run_time_text"
+            android:text="Speed"
+            android:textSize="36sp"
+            android:layout_margin="5sp"
+            />
+        <TextView
+            android:id="@+id/run_speed_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/run_speed_label"
+            android:text="0.0 mph"
+            android:textSize="24sp"
+            android:layout_margin="5sp"
+            />
+    </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/run_stats_text_right"
+            android:layout_width="wrap_content"
+            android:gravity="right"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/run_dist_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="Distance"
+            android:textAlignment="left"
+            android:textSize="36sp"
+            android:layout_margin="5sp"
+            />
+        <TextView
+            android:id="@+id/run_dist_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/run_dist_label"
+            android:layout_alignParentRight="true"
+            android:text="0.0 miles"
+            android:textSize="24sp"
+            android:layout_margin="5sp"
+            />
+            <TextView
+                android:id="@+id/run_hill_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/run_dist_text"
+                android:layout_alignParentRight="true"
+                android:text="Hill"
+                android:textAlignment="left"
+                android:textSize="36sp"
+                android:layout_margin="5sp"
+                />
+            <TextView
+                android:id="@+id/run_hill_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/run_hill_label"
+                android:layout_alignParentRight="true"
+                android:text="0.0 ft"
+                android:textSize="24sp"
+                android:layout_margin="5sp"
+                />
+            </RelativeLayout>
+
+
+
+
+        <RelativeLayout
+            android:id="@+id/run_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/run_stats_text_left"
+            android:gravity="center">
+        <ImageButton
+            android:id="@+id/go_button"
+            android:src = "@drawable/ic_play_circle_filled_black_48dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageButton
+            android:id="@+id/stop_button"
+            android:src = "@drawable/ic_pause_circle_filled_black_48dp"
+            android:layout_toRightOf="@id/go_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
 
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-              android:layout_below="@id/go_button"
               android:layout_width="match_parent"
-              android:layout_height="250dp"
+              android:layout_height="250sp"
               android:id="@+id/map"
               tools:context="com.seniorproject.trafton.trackrecordrace.MapsActivity"
               android:name="com.google.android.gms.maps.SupportMapFragment"/>
