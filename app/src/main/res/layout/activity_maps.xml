@@ -3,6 +3,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/map"
+              android:layout_width="match_parent"
+              android:layout_height="250sp"
+              tools:context="com.seniorproject.trafton.trackrecordrace.MapsActivity"
+              android:name="com.google.android.gms.maps.SupportMapFragment"/>
+
 
 
     <RelativeLayout
@@ -32,9 +40,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/run_time_label"
-            android:text="0.0s"
             android:textSize="24sp"
             android:layout_margin="5sp"
+            android:text = "00:00:00"
             />
         <TextView
             android:id="@+id/run_speed_label"
@@ -50,7 +58,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/run_speed_label"
-            android:text="0.0 mph"
             android:textSize="24sp"
             android:layout_margin="5sp"
             />
@@ -68,7 +75,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:text="Distance"
-            android:textAlignment="left"
             android:textSize="36sp"
             android:layout_margin="5sp"
             />
@@ -78,7 +84,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/run_dist_label"
             android:layout_alignParentRight="true"
-            android:text="0.0 miles"
             android:textSize="24sp"
             android:layout_margin="5sp"
             />
@@ -89,7 +94,6 @@
                 android:layout_below="@id/run_dist_text"
                 android:layout_alignParentRight="true"
                 android:text="Hill"
-                android:textAlignment="left"
                 android:textSize="36sp"
                 android:layout_margin="5sp"
                 />
@@ -99,7 +103,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/run_hill_label"
                 android:layout_alignParentRight="true"
-                android:text="0.0 ft"
                 android:textSize="24sp"
                 android:layout_margin="5sp"
                 />
@@ -130,14 +133,5 @@
         </RelativeLayout>
 
     </RelativeLayout>
-
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="250sp"
-              android:id="@+id/map"
-              tools:context="com.seniorproject.trafton.trackrecordrace.MapsActivity"
-              android:name="com.google.android.gms.maps.SupportMapFragment"/>
 
 </RelativeLayout>

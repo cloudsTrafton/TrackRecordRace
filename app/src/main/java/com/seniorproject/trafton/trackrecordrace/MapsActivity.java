@@ -6,8 +6,13 @@ package com.seniorproject.trafton.trackrecordrace;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,6 +38,29 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
     //polyline that represented the route
     Polyline tracker;
 
+    /*Load up widgets for tracking */
+    private ImageButton mPlayButton;
+    private ImageButton mPauseButton;
+
+    private TextView mRunTimeText;
+    private TextView mRunSpeedText;
+    private TextView mDistSpeedText;
+    private TextView mRunHillText;
+
+    private Boolean mIsPlayButtonClicked;
+
+    //Handler to control timer tracking
+    //Thank you to Nikos Maravitsas for the tutorial on timers
+
+    private Handler timeHandler = new Handler();
+
+    private long startTime = 0L;
+    long timeInMillis = 0L;
+    long timeSwapBuffer = 0L;
+    long updatedTime = 0L;
+
+
+
 
 
     @Override
@@ -43,7 +71,41 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
 
         mLocationProvider = new LocationProvider(this, this);
         geoPoints = new ArrayList<LatLng>(); //added
+
+        //Add in code to inflate the tracking modules
+        mRunTimeText = (TextView) findViewById(R.id.run_time_text);
+        mPlayButton = (ImageButton) findViewById(R.id.go_button);
+        mPauseButton = (ImageButton) findViewById(R.id.stop_button);
+
+        mPlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startTime = SystemClock.uptimeMillis();
+                timeHandler.postDelayed(updateTimerThread,0);
+            }
+        });
     }
+
+    /*Code to update the timer, begins a new timer thread.*/
+    private Runnable updateTimerThread = new Runnable() {
+        public void run(){
+            timeInMillis = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuffer + timeInMillis;
+
+            //Get integer value from time update and put into textView
+            int seconds = (int) (updatedTime/1000);
+            int mins = (seconds % 60);
+            int hours = (mins % 60);
+
+            mRunTimeText.setText("" + hours + ":" +
+                    String.format("%02d", mins) +
+                    String.format("%03d", seconds));
+            timeHandler.postDelayed(this,0);
+        }
+
+    };
+
+    /* */
 
     @Override
     protected void onResume() {

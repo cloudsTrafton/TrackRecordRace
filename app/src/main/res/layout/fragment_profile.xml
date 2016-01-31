@@ -11,22 +11,21 @@
         android:layout_height="wrap_content"
         android:paddingTop="50dp"
         android:paddingBottom="50dp"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
     <TextView
-        android:id="@+id/runuser"
+        android:id="@+id/runs_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Number of Runs: "
-        android:layout_below="@+id/txtwelcome"
+        android:layout_below="@id/txtuser"
         android:paddingTop="50dp"
         android:layout_centerHorizontal="true" />
     <TextView
-        android:id="@+id/raceuser"
+        android:id="@+id/races_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Number of Races: "
-        android:layout_below="@+id/runuser"
+        android:layout_below="@id/runs_user"
         android:paddingTop="50dp"
         android:layout_centerHorizontal="true" />
 
