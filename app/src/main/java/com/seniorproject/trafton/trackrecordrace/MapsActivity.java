@@ -1,16 +1,23 @@
 /*
-* Thanks go out to Ben Jakuben for the walk through on Google Maps and Location services*/
+* Thanks go out to Ben Jakuben for the walk through on Google Maps and Location services
+* Thanks go to Niko Maravitsas for the timer tutorial
+* http://examples.javacodegeeks.com/android/core/os/handler/android-timer-example/
+* */
 
 package com.seniorproject.trafton.trackrecordrace;
 
 
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -22,9 +29,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
-public class MapsActivity extends FragmentActivity implements LocationProvider.LocationCallback {
+public class MapsActivity extends AppCompatActivity implements LocationProvider.LocationCallback {
 
     public static final String TAG = MapsActivity.class.getSimpleName();
 
@@ -32,8 +42,17 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
 
     private LocationProvider mLocationProvider;
 
+    //variable for toggle buttons
+    private boolean isRunning = false;
+
     //ArrayList to store geopoints for current run
     private ArrayList<LatLng> geoPoints;
+
+    //Array of distances
+    private ArrayList<Float> distances;
+
+    //total distance
+    private float totalDistance;
 
     //polyline that represented the route
     Polyline tracker;
@@ -44,8 +63,8 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
 
     private TextView mRunTimeText;
     private TextView mRunSpeedText;
-    private TextView mDistSpeedText;
-    private TextView mRunHillText;
+    private TextView mRunDistText;
+    private TextView mRunCalsText;
 
     private Boolean mIsPlayButtonClicked;
 
@@ -74,16 +93,52 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
 
         //Add in code to inflate the tracking modules
         mRunTimeText = (TextView) findViewById(R.id.run_time_text);
-        mPlayButton = (ImageButton) findViewById(R.id.go_button);
-        mPauseButton = (ImageButton) findViewById(R.id.stop_button);
+        mRunDistText = (TextView) findViewById(R.id.run_dist_text);
+        mRunSpeedText = (TextView) findViewById(R.id.run_speed_text);
 
-        mPlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startTime = SystemClock.uptimeMillis();
-                timeHandler.postDelayed(updateTimerThread,0);
-            }
-        });
+        Toolbar runToolbar= (Toolbar) findViewById(R.id.toolbar_run);
+        runToolbar.setTitle("Run on " + getDate());
+        runToolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(runToolbar);
+
+    }
+
+    //Inflate the menu for the toolbar
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.e("XXX", "Menu created");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_maps_run, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    //Handles possibilities of menu items being selected.
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_begin_run:
+                if (!isRunning) {
+                    startTime = SystemClock.uptimeMillis();
+                    timeHandler.postDelayed(updateTimerThread,0);
+                    item.setIcon(R.drawable.ic_pause_white_24dp);
+                    isRunning = true;
+                }
+                else {
+                    timeSwapBuffer += timeInMillis;
+                    timeHandler.removeCallbacks(updateTimerThread);
+                    item.setIcon(R.drawable.ic_play_arrow_white_24dp);
+                    isRunning = false;
+
+                }
+                return true;
+
+            case R.id.action_stop_run:
+                //stop run, save run, and transport user to the stats for that run
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /*Code to update the timer, begins a new timer thread.*/
@@ -94,13 +149,15 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
 
             //Get integer value from time update and put into textView
             int seconds = (int) (updatedTime/1000);
-            int mins = (seconds % 60);
-            int hours = (mins % 60);
+            //need two seconds variables for formatting purposes.
+            int secs = seconds % 60;
+            int mins = (seconds / 60);
+            int hours = (mins / 60);
 
             mRunTimeText.setText("" + hours + ":" +
-                    String.format("%02d", mins) +
-                    String.format("%03d", seconds));
-            timeHandler.postDelayed(this,0);
+                    String.format("%02d", mins) + ":" +
+                    String.format("%02d", secs));
+            timeHandler.postDelayed(this, 0);
         }
 
     };
@@ -149,15 +206,13 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
     }
 
     /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
         //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
+    //handles the new location in real time
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
 
@@ -167,8 +222,16 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
 
         //Get the new geopoints to redraw the line on each iteration
         geoPoints.add(latLng);
-        drawRoute();
+        //get the latest distance update
+        if (geoPoints.size() > 2) {
+            calculateDistance();
+        }
+        //set the distance test
+        mRunDistText.setText(Float.toString(totalDistance) + " Meters");
+        mRunSpeedText.setText((location.getSpeed() + " m/s"));
 
+        //draw the polyline
+        drawRoute();
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
                 .title("I am here!");
@@ -176,15 +239,43 @@ public class MapsActivity extends FragmentActivity implements LocationProvider.L
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
     }
 
+    /*
+    *Methods to calculate metrics. All measurements returned are approximations.
+     */
+    //returns the latest distance between geoPoints. Append to total number
+    public void calculateDistance(){
+        Location newLoc = new Location("Latest Location");
+        Location oldLoc = new Location("Last known Location");
+        LatLng newPt = geoPoints.get(geoPoints.size()- 1);
+        LatLng oldPt = geoPoints.get(geoPoints.size()-2);
+        distances.add(oldLoc.distanceTo(newLoc));
+        //add to the distance variable
+        totalDistance = totalDistance + oldLoc.distanceTo(newLoc);
+        Log.d(TAG, "distance between points is: " + oldLoc.distanceTo(newLoc));
+    }
+
+    //calculates the current KCals being burned
+    public void calculateKcals(){
+
+    }
+
+    //get today's date in a simple format
+    public String getDate(){
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd");
+        String todaysDate = formatter.format(today);
+        return todaysDate;
+    }
+
     //method to draw polyline. Uses the recorded geopoints.
     public void drawRoute(){
         mMap.clear();
-        PolylineOptions options = new PolylineOptions().width(5).color(android.R.color.holo_green_dark).geodesic(true);
+        PolylineOptions options = new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true);
         for(int i = 0; i < geoPoints.size(); i++){
             LatLng pt = geoPoints.get(i);
             options.add(pt);
         }
         Log.d(TAG,"GeoPoints recorded: " + geoPoints);
-        tracker = mMap.addPolyline(options);
+        mMap.addPolyline(options);
     }
 }

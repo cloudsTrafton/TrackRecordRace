@@ -3,13 +3,46 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context="com.seniorproject.trafton.trackrecordrace.ChallengeFragment">
-
+<RelativeLayout
+    android:id="@+id/layout_text_challenge"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <TextView
+        android:id="@+id/wins_challenges"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to your challenges"
-        android:textSize="40dp"
-        android:textStyle="bold"
-        android:layout_centerInParent="true"/>
+        android:layout_margin="10sp"
+        android:text="Total wins: "
+        />
+    <TextView
+        android:id="@+id/losses_challenges"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total losses: "
+        android:layout_margin="10sp"
+        android:layout_below="@id/wins_challenges"
+        />
+    <TextView
+        android:id="@+id/challenges_people_list_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:text="Last Three Opponents"
+        android:layout_below="@id/losses_challenges"
+        />
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/new_challenge_button"
+        android:layout_margin="10sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="New Challenge"
+        android:textColor="#ffffff"
+        android:layout_below="@id/layout_text_challenge"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/colorPrimary"
+        />
 
 </RelativeLayout>
