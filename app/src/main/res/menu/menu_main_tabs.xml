@@ -7,16 +7,18 @@
           android:icon="@drawable/ic_directions_run_black_24dp"
           android:title="@string/go_run"
           app:showAsAction="always"/>
-      <item
-          android:id="@+id/action_settings"
-          android:icon="@drawable/ic_settings_black_24dp"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          app:showAsAction="always"/>
+
       <item
           android:id="@+id/action_logout"
           android:icon="@drawable/ic_exit_to_app_black_24dp"
           android:title="logout"
           app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_edit_friends"
+        android:icon="@drawable/ic_group_white_24dp"
+        android:title="Add friend"
+        android:orderInCategory="100"
+        app:showAsAction="always"/>
 
 </menu>

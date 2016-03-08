@@ -16,12 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-
-import java.util.ArrayList;
 
 /**
  * Thanks to Ben Jakuben for the tutorial on how to use Location Services in Android.
@@ -54,6 +49,7 @@ public class LocationProvider implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
+
                 .build();
 
         mLocationCallback = callback;
@@ -61,6 +57,7 @@ public class LocationProvider implements
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+
                 .setInterval(3 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
@@ -83,11 +80,12 @@ public class LocationProvider implements
         Log.i(TAG, "Location services connected.");
 
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (location == null) {
+        if (location != null) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            mLocationCallback.handleNewLocation(location);
         }
         else {
-            mLocationCallback.handleNewLocation(location);
+            //mLocationCallback.handleNewLocation(location);
         }
     }
 

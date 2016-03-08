@@ -69,8 +69,11 @@ public class MainTabsActivity extends AppCompatActivity {
                         MapsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_settings:
-                //begin a new ChangeSettingsActivity
+            case R.id.action_edit_friends:
+                Intent friendsIntent = new Intent(
+                        MainTabsActivity.this,
+                        EditFriendsActivity.class);
+                startActivity(friendsIntent);
                 return true;
             case R.id.action_logout:
                 //log the user out and close the application

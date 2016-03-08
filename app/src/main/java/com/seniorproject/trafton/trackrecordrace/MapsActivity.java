@@ -36,7 +36,8 @@ import java.util.Date;
 
 public class MapsActivity extends AppCompatActivity implements LocationProvider.LocationCallback {
 
-    public static final String TAG = MapsActivity.class.getSimpleName();
+    public static final String TAG = "cloudsTraf";
+            //MapsActivity.class.getSimpleName();
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -100,7 +101,6 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
         runToolbar.setTitle("Run on " + getDate());
         runToolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(runToolbar);
-
     }
 
     //Inflate the menu for the toolbar
@@ -212,7 +212,7 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
         //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
     }
 
-    //handles the new location in real time
+    //handle new location
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
 
@@ -223,11 +223,11 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
         //Get the new geopoints to redraw the line on each iteration
         geoPoints.add(latLng);
         //get the latest distance update
-        if (geoPoints.size() > 2) {
+        /*if (geoPoints.size() > 2) {
             calculateDistance();
-        }
+        } */
         //set the distance test
-        mRunDistText.setText(Float.toString(totalDistance) + " Meters");
+        //mRunDistText.setText(Float.toString(totalDistance) + " Meters");
         mRunSpeedText.setText((location.getSpeed() + " m/s"));
 
         //draw the polyline
@@ -244,14 +244,14 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
      */
     //returns the latest distance between geoPoints. Append to total number
     public void calculateDistance(){
-        Location newLoc = new Location("Latest Location");
-        Location oldLoc = new Location("Last known Location");
-        LatLng newPt = geoPoints.get(geoPoints.size()- 1);
-        LatLng oldPt = geoPoints.get(geoPoints.size()-2);
-        distances.add(oldLoc.distanceTo(newLoc));
+        //Location newLoc = new Location("Latest Location");
+        //Location oldLoc = new Location("Last known Location");
+        //LatLng newPt = geoPoints.get(geoPoints.size()- 1);
+        //LatLng oldPt = geoPoints.get(geoPoints.size()-2);
+        //distances.add(oldLoc.distanceTo(newLoc));
         //add to the distance variable
-        totalDistance = totalDistance + oldLoc.distanceTo(newLoc);
-        Log.d(TAG, "distance between points is: " + oldLoc.distanceTo(newLoc));
+        //totalDistance = totalDistance + oldLoc.distanceTo(newLoc);
+        //Log.d(TAG, "distance between points is: " + oldLoc.distanceTo(newLoc));
     }
 
     //calculates the current KCals being burned
@@ -270,7 +270,7 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
     //method to draw polyline. Uses the recorded geopoints.
     public void drawRoute(){
         mMap.clear();
-        PolylineOptions options = new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true);
+        PolylineOptions options = new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true);
         for(int i = 0; i < geoPoints.size(); i++){
             LatLng pt = geoPoints.get(i);
             options.add(pt);

@@ -1,0 +1,27 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_height="match_parent"
+                tools:context="com.seniorproject.trafton.trackrecordrace.EditFriendsActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_edit_friends"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:titleTextColor="@color/textColorPrimary"
+        android:layout_marginBottom="8sp"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/friends_recycle_view"
+        android:layout_below="@id/toolbar_edit_friends"
+        android:layout_width="match_parent"
+        android:scrollbars="vertical"
+        android:layout_height="wrap_content" />
+
+
+
+</RelativeLayout>
