@@ -78,7 +78,7 @@
             android:theme="@style/MyMaterialTheme" >
         </activity>
         <activity
-            android:name=".SendChallengeActivity"
+            android:name=".ChallengeRunActivty"
             android:label="@string/title_activity_send_challenge"
             android:theme="@style/MyMaterialTheme" >
         </activity>

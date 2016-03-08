@@ -32,7 +32,7 @@ public class ChallengeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(),
-                        SendChallengeActivity.class);
+                        ChallengeRunActivty.class);
                 startActivity(intent);
             }
         });

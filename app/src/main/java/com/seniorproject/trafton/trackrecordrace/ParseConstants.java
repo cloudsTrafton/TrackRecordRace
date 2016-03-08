@@ -5,4 +5,5 @@ package com.seniorproject.trafton.trackrecordrace;
  */
 public class ParseConstants {
     public static final String KEY_FRIENDS_RELATION = "friendsRelation";
+    public static final String KEY_CHAL_RELATION = "chalRelation";
 }
