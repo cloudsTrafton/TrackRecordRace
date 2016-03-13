@@ -9,6 +9,7 @@ import android.app.Application;
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseInstallation;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 public class ParseApplication extends Application {
@@ -19,6 +20,7 @@ public class ParseApplication extends Application {
 
         // Add your initialization code here
         Parse.enableLocalDatastore(this);
+        ParseObject.registerSubclass(Challenge.class);
         Parse.initialize(this, "poYJezuhjoh6MjgbgXSU8ZupYS9wYOAqqvowwxS0", "Ha595bt9sV3ylPodMaVBd0q50aipe77FctdFJwCj");
 
         //create Parse installation

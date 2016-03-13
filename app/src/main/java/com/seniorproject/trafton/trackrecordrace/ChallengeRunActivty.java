@@ -7,11 +7,13 @@
 package com.seniorproject.trafton.trackrecordrace;
 
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,7 +21,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,15 +32,30 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ChallengeRunActivty extends AppCompatActivity implements LocationProvider.LocationCallback {
 
-    public static final String TAG = "cloudsTraf";
+    //TODO:SAVE EACH MOTHERFUCKING RUN
+
+    /*Variables for getting Friends for challenges*/
+    public List<ParseUser> mFriends;
+    protected ParseRelation<ParseUser> mFriendsRelation;
+    protected ParseUser mCurrentUser;
+    protected String[] mUsernames;
+    /*                                            */
+
+    public static final String TAG = "CHALLENGERUN";
     //MapsActivity.class.getSimpleName();
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -93,6 +112,10 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         mLocationProvider = new LocationProvider(this, this);
         geoPoints = new ArrayList<LatLng>(); //added
 
+        /*ONLY FOR IF THERE IS GOING TO BE CHALLENGE DIALOG*/
+        mCurrentUser = ParseUser.getCurrentUser();
+        mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
+
         //Add in code to inflate the tracking modules
         mRunTimeText = (TextView) findViewById(R.id.run_time_text);
         mRunDistText = (TextView) findViewById(R.id.run_dist_text);
@@ -125,6 +148,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                     item.setIcon(R.drawable.ic_pause_white_24dp);
                     isRunning = true;
                 }
+
                 else {
                     timeSwapBuffer += timeInMillis;
                     timeHandler.removeCallbacks(updateTimerThread);
@@ -139,13 +163,19 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
             * creates a new challenge object
             * This will create a relation with the challenge object*/
             case R.id.action_stop_run:
-
+                //create a new dialog pop up
+                createDialog();
 
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    /* --------- */
+
+
+    /*---------- */
 
     /*Code to update the timer, begins a new timer thread.*/
     private Runnable updateTimerThread = new Runnable() {
@@ -175,6 +205,12 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         super.onResume();
         setUpMapIfNeeded();
         mLocationProvider.connect();
+
+        /*Get friends list*/
+        mCurrentUser = ParseUser.getCurrentUser();
+        mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
+        getFriends();
+
     }
 
     @Override
@@ -262,6 +298,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
     //calculates the current KCals being burned
     public void calculateKcals(){
+        /*TODO: FILL THIS MOTHERFUCKER IN*/
 
     }
 
@@ -273,7 +310,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         return todaysDate;
     }
 
-    //method to draw polyline. Uses the recorded geopoints.
+    /*TODO: FIX THIS MOTHERFUCKER*/
     public void drawRoute(){
         mMap.clear();
         PolylineOptions options = new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true);
@@ -281,7 +318,84 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
             LatLng pt = geoPoints.get(i);
             options.add(pt);
         }
-        Log.d(TAG,"GeoPoints recorded: " + geoPoints);
+        Log.d(TAG, "GeoPoints recorded: " + geoPoints);
         mMap.addPolyline(options);
     }
+
+    /*STOP HERE IF THIS VERSION IS UPDATED TO REPLACE THE REGULAR RUNNING VERSION
+    * }*/
+
+    /*Create Alert Dialog to pick challenger*/
+    public void createDialog(){
+        final AlertDialog.Builder challengeBuilder = new AlertDialog.Builder(ChallengeRunActivty.this);
+        challengeBuilder.setTitle("Pick a Friend to Challenge");
+        //TODO:INSERT FUNCTIONALITY FOR CREATING LISTS AND PICKING
+        getFriends();
+        challengeBuilder.setSingleChoiceItems(mUsernames, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Log.d(TAG, "item selected: " + which);
+            }
+        });
+
+
+        challengeBuilder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                /*Get updated selected position*/
+                ListView lw = ((AlertDialog)dialog).getListView();
+                int pos = lw.getCheckedItemPosition();
+                Log.d(TAG, "item selected: " + pos);
+
+                Challenge chal = new Challenge(mCurrentUser,0,mFriends.get(pos),0);
+                chal.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.d(TAG,e.toString());
+                        }
+                        else {
+                           Log.d(TAG, "saved");
+                        }
+                    }
+                });
+                Log.d(TAG, "Contender is: " + mFriends.get(pos).toString());
+                Toast.makeText(getApplicationContext(), "You have sent a challenge to " + mFriends.get(pos).getUsername() + "!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        /*Dismiss the dialog if the user does not want to send a challenge*/
+        challengeBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        challengeBuilder.show();
+
+    }
+
+    public void getFriends(){
+        mFriendsRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> friends, ParseException e) {
+                mFriends = friends;
+                /*If the user hasn't added ant friends, add the curren user to the list as indicator*/
+                if(mFriends.size() == 0){
+                   mFriends.add(ParseUser.getCurrentUser());
+                }
+                else {
+                    mUsernames = new String[friends.size()];
+                    int i = 0;
+                    for (ParseUser user: friends){
+                        mUsernames[i] = user.getUsername();
+                        i++;
+                    }
+
+                }
+            }
+        });
+    }
+
 }
