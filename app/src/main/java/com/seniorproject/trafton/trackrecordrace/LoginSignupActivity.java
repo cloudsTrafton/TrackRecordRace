@@ -1,18 +1,14 @@
 package com.seniorproject.trafton.trackrecordrace;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.support.v7.app.AppCompatActivity;
+
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -56,7 +52,8 @@ public class LoginSignupActivity extends AppCompatActivity {
                         new LogInCallback() {
                             public void done(ParseUser user, ParseException e) {
                                 if (user != null) {
-                                    // If user exist and authenticated, send user to WelcomeActivity.class
+                                    // If user succesfully logged in, update installation for push notification
+                                    ParseApplication.updateParseInstallation(user);
                                     Intent intent = new Intent(
                                             LoginSignupActivity.this,
                                             MainTabsActivity.class);

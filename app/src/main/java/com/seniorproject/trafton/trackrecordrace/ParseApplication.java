@@ -35,4 +35,11 @@ public class ParseApplication extends Application {
         ParseACL.setDefaultACL(defaultACL, true);
     }
 
+    public static void updateParseInstallation(ParseUser user){
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        installation.put(ParseConstants.KEY_USER_ID,user.getObjectId());
+        installation.saveInBackground();
+
+    }
+
 }

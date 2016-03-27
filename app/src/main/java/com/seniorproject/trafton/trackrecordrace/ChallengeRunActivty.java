@@ -2,6 +2,8 @@
 * Thanks go out to Ben Jakuben for the walk through on Google Maps and Location services
 * Thanks go to Niko Maravitsas for the timer tutorial
 * http://examples.javacodegeeks.com/android/core/os/handler/android-timer-example/
+*
+* This is the activity for the SENDER CHALLENGE portion. This sends the challenge to the user.
 * */
 
 package com.seniorproject.trafton.trackrecordrace;
@@ -34,6 +36,9 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -211,6 +216,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
         getFriends();
 
+
     }
 
     @Override
@@ -348,17 +354,24 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                 Log.d(TAG, "item selected: " + pos);
 
                 Challenge chal = new Challenge(mCurrentUser,0,mFriends.get(pos),0);
+                //TODO: chal.setDistance(distanceRan);
+                final ParseUser contender = mFriends.get(pos);
                 chal.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e != null) {
-                            Log.d(TAG,e.toString());
-                        }
-                        else {
-                           Log.d(TAG, "saved");
+                            Log.d(TAG, e.toString());
+                        } else {
+                            Log.d(TAG, "saved");
+                            sendPushNotification(contender, mCurrentUser);
+
+                            //The line below is simply for testing purposes
+                            sendPushNotification(mCurrentUser,mCurrentUser);
+
                         }
                     }
                 });
+                //mChalRelationSend.add(chal);
                 Log.d(TAG, "Contender is: " + mFriends.get(pos).toString());
                 Toast.makeText(getApplicationContext(), "You have sent a challenge to " + mFriends.get(pos).getUsername() + "!", Toast.LENGTH_SHORT).show();
             }
@@ -382,13 +395,12 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
             public void done(List<ParseUser> friends, ParseException e) {
                 mFriends = friends;
                 /*If the user hasn't added ant friends, add the curren user to the list as indicator*/
-                if(mFriends.size() == 0){
-                   mFriends.add(ParseUser.getCurrentUser());
-                }
-                else {
+                if (mFriends.size() == 0) {
+                    mFriends.add(ParseUser.getCurrentUser());
+                } else {
                     mUsernames = new String[friends.size()];
                     int i = 0;
-                    for (ParseUser user: friends){
+                    for (ParseUser user : friends) {
                         mUsernames[i] = user.getUsername();
                         i++;
                     }
@@ -396,6 +408,19 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                 }
             }
         });
+    }
+
+    /*Send a notification to a user that they have been challenged
+    * @param the parse user to send notification to*/
+    protected  void sendPushNotification(ParseUser cont, ParseUser chal){
+        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+        query.whereEqualTo(ParseConstants.KEY_USER_ID,cont.getObjectId());
+
+        ParsePush push = new ParsePush();
+        push.setQuery(query);
+        push.setMessage(chal.getUsername() + " has sent you a challenge!");
+        push.sendInBackground();
+
     }
 
 }

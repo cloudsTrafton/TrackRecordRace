@@ -12,6 +12,7 @@ public class Challenge extends ParseObject{
     private float chalTime;
     private ParseUser contender;
     private float conTime;
+    private float distance;
 
     //Requires a default constructor
     public Challenge(){
@@ -27,6 +28,7 @@ public class Challenge extends ParseObject{
         this.put("Contender",contender);
         conTime = con_time;
         this.put("ContenderTime", conTime);
+        this.put("Distance", 00.00);
 
     }
 
@@ -65,6 +67,14 @@ public class Challenge extends ParseObject{
     public void setConTime(float conTime) {
         this.conTime = conTime;
         //this.put("ContenderTime", conTime);
+    }
+
+    public float getDistance(){
+        return distance;
+    }
+
+    public void setDistance(float dist){
+        this.distance = dist;
     }
 
 

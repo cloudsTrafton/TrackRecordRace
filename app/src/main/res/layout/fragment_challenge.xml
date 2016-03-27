@@ -22,15 +22,12 @@
         android:layout_margin="10sp"
         android:layout_below="@id/wins_challenges"
         />
-    <TextView
-        android:id="@+id/challenges_people_list_label"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/SentChallengeCardList"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10sp"
-        android:text="Last Three Opponents"
-        android:layout_below="@id/losses_challenges"
         />
-    </RelativeLayout>
+</RelativeLayout>
 
 
     <Button

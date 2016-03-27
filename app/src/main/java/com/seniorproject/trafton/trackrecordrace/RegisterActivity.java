@@ -88,6 +88,8 @@ public class RegisterActivity extends AppCompatActivity {
                     user.put("weight",weightNum);
                     user.put("phoneNumber",phoneNum);
                     user.put("genderCode",gender);
+                    user.put("wins", 0);
+                    user.put("losses", 0);
                     user.setPassword(passwordtxt);
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
