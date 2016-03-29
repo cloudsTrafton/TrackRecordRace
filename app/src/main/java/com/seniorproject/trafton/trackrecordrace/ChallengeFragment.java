@@ -17,6 +17,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -28,7 +30,17 @@ public class ChallengeFragment extends Fragment {
     public static final String TAG = "CHALLENGEFRAGMENT";
     Button mNewChallengeButton;
     ParseUser mCurrentUser = ParseUser.getCurrentUser();
-    List<Challenge> mChallenges;
+
+
+    Challenge test = new Challenge(mCurrentUser,40,mCurrentUser,30);
+    //List<Challenge> mChallenges = Arrays.asList(test);
+    List<Challenge> mChallenges = new ArrayList<Challenge>();
+    //mChallenges.add(test);
+
+
+    /* Make a dummy challenge*/
+
+
 
     private RecyclerView mChallengeList;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -63,27 +75,32 @@ public class ChallengeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        getChallenges();
+        //getChallenges();
+        //Test dummy challange
         return rootView;
     }
 
     @Override
     public void onResume(){
         super.onResume();
+        mChallenges.clear();
         getChallenges();
 
     }
 
-    /*Load ALL of the challenges!!! :D!!!*/
+
+    /*Method that returns all challenges sent to the current user.
+    * Looks in Parse for when currentUser is the Contender.
+    * The challenges they have sent will be viewable in "statistics"*/
     public void getChallenges(){
+        ParseQuery innerQuery = new ParseQuery("_User");
+        innerQuery.whereEqualTo("username",mCurrentUser.getUsername());
         ParseQuery query = new ParseQuery("Challenge");
-        //ParseObject cur = ParseObject.createWithoutData("_User",mCurrentUser.getObjectId());
-        query.whereEqualTo(ParseConstants.KEY_SELF_CONTENDER, mCurrentUser);
-        Log.d(TAG,mCurrentUser.toString());
-        query.whereEqualTo(ParseConstants.KEY_SELF_CHALLENGER, mCurrentUser);
+        query.whereMatchesQuery(ParseConstants.KEY_SELF_CONTENDER, innerQuery);
+        query.include("Challenger");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List objects, ParseException e) {
+            public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null){
                     Integer test = objects.size();
                     Log.d(TAG, "Number returned: " + test.toString());
@@ -91,7 +108,20 @@ public class ChallengeFragment extends Fragment {
                         //Display a message saying you have no challenges at this time
                     }
                     else {
-                        mChallenges.addAll(objects);
+                        /*Parse each object into a readable format*/
+                        for(int i = 0; i < objects.size(); i++){
+                            ParseObject item = objects.get(i);
+                            ParseUser challenger = (ParseUser) item.get("Challenger");
+                            ParseUser contender = (ParseUser) item.get("Contender");
+                            double chalTime = (double) item.get("ChallengerTime");
+                            double distance = (double) item.get("Distance");
+                            Date createdAt = (Date) item.getCreatedAt();
+                            Log.d(TAG,"Challenger: " + challenger.getUsername());
+                            Challenge temp = new Challenge(challenger,chalTime,contender,distance,createdAt);
+                            mChallenges.add(temp);
+                        }
+                        //mChallenges.addAll(objects);
+
                     }
 
                     mAdapter = new ChallengeListAdapter(mChallenges);

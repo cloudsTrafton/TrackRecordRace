@@ -52,6 +52,7 @@ import java.util.List;
 public class ChallengeRunActivty extends AppCompatActivity implements LocationProvider.LocationCallback {
 
     //TODO:SAVE EACH MOTHERFUCKING RUN
+    //TODO: IMPLEMENT RUNNING STATS INCLUDING DISTANCE, SPEED AND kcals
 
     /*Variables for getting Friends for challenges*/
     public List<ParseUser> mFriends;
@@ -110,7 +111,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*TODO: change the layout slightly so that it includes the ability to send a challenge*/
+        /*DONE: change the layout slightly so that it includes the ability to send a challenge*/
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
@@ -126,7 +127,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         mRunDistText = (TextView) findViewById(R.id.run_dist_text);
         mRunSpeedText = (TextView) findViewById(R.id.run_speed_text);
 
-        /*TODO: When the run is stopped, open up a new activity that allows a user to pick a friend to send a challenge to. */
+        /*DONE: When the run is stopped, open up a new activity that allows a user to pick a friend to send a challenge to. */
         Toolbar runToolbar= (Toolbar) findViewById(R.id.toolbar_run);
         runToolbar.setTitle("Challenge run on " + getDate());
         runToolbar.setTitleTextColor(Color.WHITE);
@@ -163,7 +164,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                 }
                 return true;
 
-            /*TODO: new activity opens up allowing the user to select who to send the run to.
+            /*DONE: new activity opens up allowing the user to select who to send the run to.
             * The run time and challenger ID will be saved to the challenge object
             * creates a new challenge object
             * This will create a relation with the challenge object*/

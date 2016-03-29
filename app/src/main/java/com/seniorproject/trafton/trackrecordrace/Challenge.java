@@ -6,20 +6,24 @@ package com.seniorproject.trafton.trackrecordrace;
  */
 import com.parse.*;
 
+import java.util.Date;
+
 @ParseClassName("Challenge")
 public class Challenge extends ParseObject{
     private ParseUser challenger;
-    private float chalTime;
+    private double chalTime;
     private ParseUser contender;
-    private float conTime;
-    private float distance;
+    private double conTime;
+    private double distance;
+    private Date createdOn;
 
     //Requires a default constructor
     public Challenge(){
 
     }
 
-    public Challenge(ParseUser chal, float chal_time, ParseUser con, float con_time){
+    /*Constructor used to create a new challenge in the database*/
+    public Challenge(ParseUser chal, double chal_time, ParseUser con, double con_time){
         challenger = chal;
         this.put("Challenger", challenger);
         chalTime = chal_time;
@@ -32,6 +36,17 @@ public class Challenge extends ParseObject{
 
     }
 
+    /*Constructor used to load a new challenge into the application*/
+    public Challenge(ParseUser chal, double chal_time, ParseUser con, double dist, Date d){
+        challenger = chal;
+        chalTime = chal_time;
+        contender = con;
+        distance = dist;
+        createdOn = d;
+
+    }
+
+
     /*Getters and setters*/
     public ParseUser getChallenger() {
         return challenger;
@@ -42,7 +57,7 @@ public class Challenge extends ParseObject{
         //this.put("Challenger", challenger);
     }
 
-    public float getChalTime() {
+    public double getChalTime() {
         return chalTime;
     }
 
@@ -57,24 +72,26 @@ public class Challenge extends ParseObject{
 
     public void setContender(ParseUser contender) {
         this.contender = contender;
-        //this.put("Contender",contender);
     }
 
-    public float getConTime() {
+    public double getConTime() {
         return conTime;
     }
 
-    public void setConTime(float conTime) {
-        this.conTime = conTime;
-        //this.put("ContenderTime", conTime);
+    public void setConTime(double conTime) {
+        this.conTime = conTime;;
     }
 
-    public float getDistance(){
+    public double getDistance(){
         return distance;
     }
 
-    public void setDistance(float dist){
+    public void setDistance(double dist){
         this.distance = dist;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
     }
 
 
