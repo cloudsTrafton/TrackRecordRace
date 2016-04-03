@@ -42,6 +42,7 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,8 +68,8 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
     private boolean isRunning = false;
     private ArrayList<LatLng> geoPoints = new ArrayList<LatLng>();
     private ArrayList<Double> distances = new ArrayList<Double>();
-    private Double totalDistance;
-
+    private ArrayList<Double> speeds = new ArrayList<Double>();
+    protected DecimalFormat df = new DecimalFormat("#.##");
 
     private TextView mRunTimeText;
     private TextView mRunSpeedText;
@@ -97,7 +98,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         setUpMapIfNeeded();
 
         mLocationProvider = new LocationProvider(this, this);
-        geoPoints = new ArrayList<LatLng>(); //added
+        geoPoints = new ArrayList<LatLng>();
 
         /*ONLY FOR IF THERE IS GOING TO BE CHALLENGE DIALOG*/
         mCurrentUser = ParseUser.getCurrentUser();
@@ -249,10 +250,17 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
     //handle new location
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
+
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
         LatLng point = new LatLng(currentLatitude, currentLongitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 20));
+
+        Double currentSpeed = toMPH(location.getSpeed());
+
+        /*Get the running speed, even when the user has stopped running.*/
+        mRunSpeedText.setText((df.format(currentSpeed + " m/h")));
 
         /*If this is the first location, then create a marker for the starting point*/
         if(geoPoints.size() == 0){
@@ -267,9 +275,11 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
             /*Get Metrics*/
             geoPoints.add(point);
             route.setPoints(geoPoints);
-            mRunSpeedText.setText((location.getSpeed() + " m/s"));
+            route = mMap.addPolyline(new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true));
+            mRunSpeedText.setText((df.format(currentSpeed + " m/h")));
+            speeds.add(currentSpeed);
             if(geoPoints.size() > 1){
-                mRunDistText.setText(getNewDistance() + " miles");
+                mRunDistText.setText(df.format(getNewDistance()) + " miles");
             }
 
         }
@@ -308,8 +318,13 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
     }
 
-    /*Method to update the screen on each location poll*/
-    public void update(LatLng point){
+    /*Method to update the screen on each location poll
+    * Returns the speed as a Double*/
+    public Double toMPH(float val){
+        Float valTemp = val;
+        Double mps = valTemp.doubleValue();
+        mps = mps * 2.23694;
+        return mps;
 
     }
 
