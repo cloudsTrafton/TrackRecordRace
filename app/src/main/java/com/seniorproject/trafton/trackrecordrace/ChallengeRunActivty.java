@@ -52,12 +52,10 @@ import java.util.List;
 public class ChallengeRunActivty extends AppCompatActivity implements LocationProvider.LocationCallback {
 
     //TODO:SAVE EACH MOTHERFUCKING RUN
-    //TODO: IMPLEMENT RUNNING STATS INCLUDING DISTANCE, SPEED AND kcals
 
     /*Variables for getting Friends for challenges*/
     public List<ParseUser> mFriends;
     protected ParseRelation<ParseUser> mFriendsRelation;
-    protected ParseUser mCurrentUser;
     protected String[] mUsernames;
     /* THESE ABOVE CAN BE REMOVED IN REGULAR RUNS */
 
@@ -65,29 +63,54 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LocationProvider mLocationProvider;
     Polyline route;
-    private boolean isRunning = false;
+    protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
+    double weight = mCurrentUser.getDouble(ParseConstants.KEY_USER_WEIGHT);
+
     private ArrayList<LatLng> geoPoints = new ArrayList<LatLng>();
     private ArrayList<Double> distances = new ArrayList<Double>();
     private ArrayList<Double> speeds = new ArrayList<Double>();
     protected DecimalFormat df = new DecimalFormat("#.##");
+
+    CalorieCalc calorieCounter = new CalorieCalc(weight);
+    protected Double calories = 0.0;
+    private boolean isRunning = false;
+    protected int seconds;
 
     private TextView mRunTimeText;
     private TextView mRunSpeedText;
     private TextView mRunDistText;
     private TextView mRunCalsText;
 
-    private Boolean mIsPlayButtonClicked;
-
-    protected boolean startingPoint;
-    //Handler to control timer tracking
+    /*------------------Handle Timer--------------------------------*/
     //Thank you to Nikos Maravitsas for the tutorial on timers
-
     private Handler timeHandler = new Handler();
 
     private long startTime = 0L;
     long timeInMillis = 0L;
     long timeSwapBuffer = 0L;
     long updatedTime = 0L;
+
+    /*Code to update the timer, begins a new timer thread.*/
+    private Runnable updateTimerThread = new Runnable() {
+        public void run(){
+            timeInMillis = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuffer + timeInMillis;
+
+            //Get integer value from time update and put into textView
+            seconds = (int) (updatedTime/1000);
+            //need two seconds variables for formatting purposes.
+            int secs = seconds % 60;
+            int mins = (seconds / 60);
+            int hours = (mins / 60);
+
+            mRunTimeText.setText("" + hours + ":" +
+                    String.format("%02d", mins) + ":" +
+                    String.format("%02d", secs));
+            timeHandler.postDelayed(this, 0);
+        }
+
+    };
+    /*__________________End Timer Code-----------------------------*/
 
 
     @Override
@@ -96,18 +119,16 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         /*DONE: change the layout slightly so that it includes the ability to send a challenge*/
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-
         mLocationProvider = new LocationProvider(this, this);
-        geoPoints = new ArrayList<LatLng>();
 
         /*ONLY FOR IF THERE IS GOING TO BE CHALLENGE DIALOG*/
-        mCurrentUser = ParseUser.getCurrentUser();
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
 
         //Add in code to inflate the tracking modules
         mRunTimeText = (TextView) findViewById(R.id.run_time_text);
         mRunDistText = (TextView) findViewById(R.id.run_dist_text);
         mRunSpeedText = (TextView) findViewById(R.id.run_speed_text);
+        mRunCalsText = (TextView) findViewById(R.id.run_kcals_text);
 
         /*DONE: When the run is stopped, open up a new activity that allows a user to pick a friend to send a challenge to. */
         Toolbar runToolbar= (Toolbar) findViewById(R.id.toolbar_run);
@@ -145,17 +166,12 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
                 }
                 return true;
-
-            /*DONE: new activity opens up allowing the user to select who to send the run to.
-            * The run time and challenger ID will be saved to the challenge object
-            * creates a new challenge object
-            * This will create a relation with the challenge object*/
             case R.id.action_stop_run:
-                //create a new dialog pop up
                 createDialog();
 
                 /*Inside of the regular run, the code will put a call to saveRun()*/
-                //saveRun();
+                //TODO add this to the individual running portion
+                //saveRun(getNewDistance(),seconds,calories);
 
                 return true;
             default:
@@ -167,41 +183,17 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
 
     /*---------- */
-
-    /*Code to update the timer, begins a new timer thread.*/
-    private Runnable updateTimerThread = new Runnable() {
-        public void run(){
-            timeInMillis = SystemClock.uptimeMillis() - startTime;
-            updatedTime = timeSwapBuffer + timeInMillis;
-
-            //Get integer value from time update and put into textView
-            int seconds = (int) (updatedTime/1000);
-            //need two seconds variables for formatting purposes.
-            int secs = seconds % 60;
-            int mins = (seconds / 60);
-            int hours = (mins / 60);
-
-            mRunTimeText.setText("" + hours + ":" +
-                    String.format("%02d", mins) + ":" +
-                    String.format("%02d", secs));
-            timeHandler.postDelayed(this, 0);
-        }
-
-    };
-
-    /* */
-
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
         mLocationProvider.connect();
 
-        /*Get friends list*/
+        /*------GET RELATION FOR CHALLENGE RUN---------------------*/
         mCurrentUser = ParseUser.getCurrentUser();
         mFriendsRelation = mCurrentUser.getRelation(ParseConstants.KEY_FRIENDS_RELATION);
         getFriends();
-
+        /*--------------------------------------------------------*/
 
     }
 
@@ -247,7 +239,9 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         /*Void for now...*/
     }
 
-    //handle new location
+    /*---------------------------HANDLE NEW LOCATION---------------------------------------*/
+    /*This method does a lot of the heavy lifting and updates the metrics as well as the views*/
+
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
 
@@ -258,9 +252,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 20));
 
         Double currentSpeed = toMPH(location.getSpeed());
-
-        /*Get the running speed, even when the user has stopped running.*/
-        mRunSpeedText.setText((df.format(currentSpeed + " m/h")));
+        float currentSpeedMetersPerMinute = location.getSpeed() * 60;
 
         /*If this is the first location, then create a marker for the starting point*/
         if(geoPoints.size() == 0){
@@ -272,23 +264,34 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
         /*If the user has not paused the run, then get the metrics*/
         if(isRunning){
-            /*Get Metrics*/
             geoPoints.add(point);
             route.setPoints(geoPoints);
             route = mMap.addPolyline(new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true));
-            mRunSpeedText.setText((df.format(currentSpeed + " m/h")));
             speeds.add(currentSpeed);
+
+            calories += calorieCounter.getCaloriesVO2(currentSpeedMetersPerMinute);
+
+            /*---------UPDATE VIEWS---------*/
             if(geoPoints.size() > 1){
                 mRunDistText.setText(df.format(getNewDistance()) + " miles");
             }
+            mRunSpeedText.setText((df.format(currentSpeed)) + " m/h");
+            if (currentSpeed != 0){
+                mRunCalsText.setText(df.format(calories));
+            }
+            else {
+                //Do not update
+            }
+            /*---------FINISH UPDATING VIEWS---------*/
+
 
         }
 
     }
 
-    /*
-    *Methods to calculate metrics. All measurements returned are approximations.
-     */
+    /*------------------------END HANDLE NEW LOCATION---------------------------------------------*/
+
+    /*-------------------------Get the Metrics----------------------------------------------------*/
 
     //returns the latest distance between geoPoints. Append to total number. Multiplier returns distance in miles
     public Double getNewDistance(){
@@ -312,12 +315,6 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         return sum;
     }
 
-    //calculates the current KCals being burned
-    public void calculateCals(){
-        /*TODO: FILL THIS MOTHERFUCKER IN*/
-
-    }
-
     /*Method to update the screen on each location poll
     * Returns the speed as a Double*/
     public Double toMPH(float val){
@@ -327,6 +324,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         return mps;
 
     }
+    /*-------------------------Get the Metrics----------------------------------------------------*/
 
     //get today's date in a simple format
     public String getDate(){
@@ -336,33 +334,31 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         return todaysDate;
     }
 
-
-    /*------------------FINISHED CONTENT FOR JUST THE REGULAR RUN-------------------*/
-
     /*THIS METHOD IS ONLY FOR THE NON-CHALLENGE RUNS */
-    //TODO implement this
-    /*Save the run in the backend*/
     protected void saveRun(double dist, double time, double kcals){
         Run run = new Run(mCurrentUser,dist,time,kcals);
     }
+    /*-----END ONLY FOR NON-CHALLENGE RUNS------------*/
 
-    /*STOP HERE IF THIS VERSION IS UPDATED TO REPLACE THE REGULAR RUNNING VERSION
-    * }*/
 
-    /*Create Alert Dialog to pick challenger
-    * Displays a list of the user's friends and allows them to select one friend to send the challenge to*/
+    /*------------------FINISHED CONTENT FOR JUST THE REGULAR RUN-------------------*/
+
+
+
+    /*STOP HERE IF THIS VERSION IS UPDATED TO REPLACE THE REGULAR RUNNING VERSION - THE FOLLOWING IS JUST FOR SENDING CHALLENGES*/
+
+    /*------------------CREATE DIALOG--------------------------------------------- */
+    /* Displays a list of the user's friends and allows them to select one friend to send the challenge to*/
     public void createDialog(){
         final AlertDialog.Builder challengeBuilder = new AlertDialog.Builder(ChallengeRunActivty.this);
         challengeBuilder.setTitle("Pick a Friend to Challenge");
-        //TODO:INSERT FUNCTIONALITY FOR CREATING LISTS AND PICKING
         getFriends();
         challengeBuilder.setSingleChoiceItems(mUsernames, -1, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //Log.d(TAG, "item selected: " + which);
+
             }
         });
-
 
         challengeBuilder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
             @Override
@@ -403,10 +399,9 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                 dialog.dismiss();
             }
         });
-
         challengeBuilder.show();
-
     }
+     /*------------------END CREATE DIALOG--------------------------------------------- */
 
     public void getFriends(){
         mFriendsRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {

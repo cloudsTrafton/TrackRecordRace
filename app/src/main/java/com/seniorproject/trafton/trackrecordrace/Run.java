@@ -10,11 +10,9 @@ import com.parse.*;
 @ParseClassName("Run")
 public class Run extends ParseObject{
     ParseUser owner;
-    double distance;
-    double time;
-    double cals;
-
-    //maybe add avg speed?
+    Double distance;
+    Double time;
+    Double calories;
 
     /*Required default constructor*/
     public Run(){
@@ -24,40 +22,41 @@ public class Run extends ParseObject{
     /*Actual usable constructor.
     * Time is uploaded in seconds. When viewed, will be parsed to minutes.
     * Also sends data to backend and creates a new row*/
-    public Run(ParseUser o, double d, double t, double c){
+    public Run(ParseUser o, Double d, Double t, Double c){
         owner = o;
         this.put("Owner",owner);
         distance = d;
         this.put("Distance",distance);
         time = t;
         this.put("Time",time);
-        cals = c;
+        calories = c;
+        this.put("Calories",calories);
     }
 
     /*Getters*/
-    public double getDistance() {
+    public Double getDistance() {
         return distance;
     }
 
-    public double getTime() {
+    public Double getTime() {
         return time;
     }
 
-    public double getCals() {
-        return cals;
+    public Double getCalories() {
+        return calories;
     }
 
     /*Setters*/
-    public void setDistance(double distance) {
+    public void setDistance(Double distance) {
         this.distance = distance;
     }
 
-    public void setTime(double time) {
+    public void setTime(Double time) {
         this.time = time;
     }
 
-    public void setCals(double cals) {
-        this.cals = cals;
+    public void setCalories(Double cals) {
+        this.calories = cals;
     }
 
 
