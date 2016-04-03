@@ -21,6 +21,7 @@ public class ParseApplication extends Application {
         // Add your initialization code here
         Parse.enableLocalDatastore(this);
         ParseObject.registerSubclass(Challenge.class);
+        ParseObject.registerSubclass(Run.class);
         Parse.initialize(this, "poYJezuhjoh6MjgbgXSU8ZupYS9wYOAqqvowwxS0", "Ha595bt9sV3ylPodMaVBd0q50aipe77FctdFJwCj");
 
         //create Parse installation

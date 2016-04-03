@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="10dip" >
     <TextView
         android:id="@+id/instructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="50dp"
+        android:layout_marginBottom="10dp"
         android:textColor="@color/colorPrimary"
+        android:layout_alignParentTop="true"
         android:textStyle="bold"
         android:text="Welcome to TrackRecordRace! Please enter the following information to the best of your ability."
         />
@@ -18,6 +19,7 @@
         android:id="@+id/txtusername"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/instructions"
         android:text="Enter a Username" />
 
@@ -29,26 +31,12 @@
         android:inputType="text" />
 
     <TextView
-        android:id="@+id/txtphone_number"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/username"
-        android:text="Enter Mobile Number"
-        />
-    <EditText
-        android:id="@+id/phone_number"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/txtphone_number"
-        android:inputType="number"
-        />
-
-    <TextView
         android:id="@+id/txtweight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/phone_number"
-        android:text="Enter your Weight"
+        android:layout_below="@id/username"
+        android:layout_marginTop="20dp"
+        android:text="Enter your Weight (Don't worry, we're not judging)"
         />
 
     <EditText
@@ -64,16 +52,17 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/weight"
+        android:layout_marginTop="20dp"
         android:text="Pick your Gender"
         />
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/gender_checkbox_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/txtgender"
-        android:layout_marginTop="34dp" >
+        >
 
         <CheckBox
             android:id="@+id/cb_male"
@@ -97,10 +86,11 @@
             android:text=" Female"
             android:onClick="onCheckboxClicked"
             />
-    </RelativeLayout>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txtpassword"
+        android:layout_marginTop="20dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/gender_checkbox_layout"
@@ -118,7 +108,7 @@
         android:id="@+id/register_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/password"
+        android:layout_alignParentBottom="true"
         android:text="Complete Registration" />
 
 </RelativeLayout>

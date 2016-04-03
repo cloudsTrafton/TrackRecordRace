@@ -22,16 +22,14 @@ public class RegisterActivity extends AppCompatActivity {
     String usernametxt;
     String passwordtxt;
     String weighttxt;
-    String phoneNumtxt;
     int weightNum;
-    int phoneNum;
+
     String gender;
     Boolean genderEntered;
 
     EditText password;
     EditText username;
     EditText weight;
-    EditText pNumber;
 
     CheckBox male;
     CheckBox female;
@@ -46,7 +44,6 @@ public class RegisterActivity extends AppCompatActivity {
         //wire up widgets
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
-        pNumber = (EditText) findViewById(R.id.phone_number);
         weight = (EditText) findViewById(R.id.weight);
         male = (CheckBox) findViewById(R.id.cb_male);
         female = (CheckBox) findViewById(R.id.cb_female);
@@ -70,13 +67,12 @@ public class RegisterActivity extends AppCompatActivity {
                 weighttxt = weight.getText().toString();
                 weightNum = Integer.parseInt(weighttxt);
 
-                phoneNumtxt = pNumber.getText().toString();
-                phoneNum = Integer.parseInt(phoneNumtxt);
+
 
 
                 //weight has to be between 0 and 999
                 // Force user to fill up the form
-                if (usernametxt.equals("") && passwordtxt.equals("") && phoneNumtxt.equals("") && weighttxt.equals("") && weightNum < 0 && genderEntered == false ) {
+                if (usernametxt.equals("") && passwordtxt.equals("") && weighttxt.equals("") && weightNum < 0 && genderEntered == false ) {
                     Toast.makeText(getApplicationContext(),
                             "Please complete the sign up form",
                             Toast.LENGTH_LONG).show();
@@ -86,11 +82,13 @@ public class RegisterActivity extends AppCompatActivity {
                     ParseUser user = new ParseUser();
                     user.setUsername(usernametxt);
                     user.put("weight",weightNum);
-                    user.put("phoneNumber",phoneNum);
                     user.put("genderCode",gender);
                     user.put("wins", 0);
                     user.put("losses", 0);
                     user.setPassword(passwordtxt);
+
+                    /*Fields that will initially be blank, related to challenges*/
+
                     user.signUpInBackground(new SignUpCallback() {
                         public void done(ParseException e) {
                             if (e == null) {

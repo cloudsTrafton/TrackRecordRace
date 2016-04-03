@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.parse.ParseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,24 +37,22 @@ import java.util.Date;
 
 public class MapsActivity extends AppCompatActivity implements LocationProvider.LocationCallback {
 
+
     public static final String TAG = "cloudsTraf";
             //MapsActivity.class.getSimpleName();
+    private ParseUser mCurrentUser;
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     private LocationProvider mLocationProvider;
-
     //variable for toggle buttons
     private boolean isRunning = false;
-
     //ArrayList to store geopoints for current run
     private ArrayList<LatLng> geoPoints;
-
     //Array of distances
     private ArrayList<Float> distances;
 
-    //total distance
-    private float totalDistance;
+    private double totalDistance;
+    private double calories;
 
     //polyline that represented the route
     Polyline tracker;
@@ -91,6 +90,7 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
 
         mLocationProvider = new LocationProvider(this, this);
         geoPoints = new ArrayList<LatLng>(); //added
+        mCurrentUser = ParseUser.getCurrentUser();
 
         //Add in code to inflate the tracking modules
         mRunTimeText = (TextView) findViewById(R.id.run_time_text);
@@ -220,29 +220,33 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
         double currentLongitude = location.getLongitude();
         LatLng latLng = new LatLng(currentLatitude, currentLongitude);
 
-        //Get the new geopoints to redraw the line on each iteration
+        /*Get the new geopoints for each time handleNewLocation is called
+        * This will help update speed and distance as well*/
         geoPoints.add(latLng);
-        //get the latest distance update
-        /*if (geoPoints.size() > 2) {
-            calculateDistance();
-        } */
-        //set the distance test
-        //mRunDistText.setText(Float.toString(totalDistance) + " Meters");
-        mRunSpeedText.setText((location.getSpeed() + " m/s"));
 
-        //draw the polyline
-        drawRoute();
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title("I am here!");
-        mMap.addMarker(options);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
+        /*If the user has not paused the run, then get the metrics*/
+        if(isRunning){
+            mRunSpeedText.setText((location.getSpeed() + " m/s"));
+            //draw the polyline
+            drawRoute();
+            MarkerOptions options = new MarkerOptions()
+                    .position(latLng)
+                    .title("I am here!");
+            mMap.addMarker(options);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        }
+
+
+
+
+
     }
 
     /*
     *Methods to calculate metrics. All measurements returned are approximations.
      */
-    //returns the latest distance between geoPoints. Append to total number
+
+    /*Calculates distance using Haversine formula*/
     public void calculateDistance(){
         //Location newLoc = new Location("Latest Location");
         //Location oldLoc = new Location("Last known Location");
@@ -257,6 +261,11 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
     //calculates the current KCals being burned
     public void calculateKcals(){
 
+    }
+
+    /*Create instance of this run in Parse database*/
+    protected void saveRun(double dist, double time, double kcals){
+        Run run = new Run(mCurrentUser,dist,time,kcals);
     }
 
     //get today's date in a simple format

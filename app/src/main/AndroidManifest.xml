@@ -125,6 +125,11 @@
         <activity
             android:name=".SearchFriendActivity"
             android:label="@string/title_activity_search_friend"
+            android:theme="@style/MyMaterialTheme" >
+        </activity>
+        <activity
+            android:name=".ChallengeResponseRunActivity"
+            android:label="@string/title_activity_challenge_response_run"
             android:theme="@style/MyMaterialTheme">
         </activity>
     </application>

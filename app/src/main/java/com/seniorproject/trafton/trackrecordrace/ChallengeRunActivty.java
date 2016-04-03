@@ -22,7 +22,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,33 +58,17 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
     protected ParseRelation<ParseUser> mFriendsRelation;
     protected ParseUser mCurrentUser;
     protected String[] mUsernames;
-    /*                                            */
+    /* THESE ABOVE CAN BE REMOVED IN REGULAR RUNS */
 
     public static final String TAG = "CHALLENGERUN";
-    //MapsActivity.class.getSimpleName();
-
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-
     private LocationProvider mLocationProvider;
-
-    //variable for toggle buttons
+    Polyline route;
     private boolean isRunning = false;
+    private ArrayList<LatLng> geoPoints = new ArrayList<LatLng>();
+    private ArrayList<Double> distances = new ArrayList<Double>();
+    private Double totalDistance;
 
-    //ArrayList to store geopoints for current run
-    private ArrayList<LatLng> geoPoints;
-
-    //Array of distances
-    private ArrayList<Float> distances;
-
-    //total distance
-    private float totalDistance;
-
-    //polyline that represented the route
-    Polyline tracker;
-
-    /*Load up widgets for tracking */
-    private ImageButton mPlayButton;
-    private ImageButton mPauseButton;
 
     private TextView mRunTimeText;
     private TextView mRunSpeedText;
@@ -94,6 +77,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
     private Boolean mIsPlayButtonClicked;
 
+    protected boolean startingPoint;
     //Handler to control timer tracking
     //Thank you to Nikos Maravitsas for the tutorial on timers
 
@@ -103,9 +87,6 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
     long timeInMillis = 0L;
     long timeSwapBuffer = 0L;
     long updatedTime = 0L;
-
-
-
 
 
     @Override
@@ -171,6 +152,9 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
             case R.id.action_stop_run:
                 //create a new dialog pop up
                 createDialog();
+
+                /*Inside of the regular run, the code will put a call to saveRun()*/
+                //saveRun();
 
                 return true;
             default:
@@ -249,6 +233,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                     .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
+                route = mMap.addPolyline(new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true));
                 setUpMap();
             }
         }
@@ -258,54 +243,73 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        /*Void for now...*/
     }
 
     //handle new location
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
-
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+        LatLng point = new LatLng(currentLatitude, currentLongitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
 
-        //Get the new geopoints to redraw the line on each iteration
-        geoPoints.add(latLng);
-        //get the latest distance update
-        /*if (geoPoints.size() > 2) {
-            calculateDistance();
-        } */
-        //set the distance test
-        //mRunDistText.setText(Float.toString(totalDistance) + " Meters");
-        mRunSpeedText.setText((location.getSpeed() + " m/s"));
+        /*If this is the first location, then create a marker for the starting point*/
+        if(geoPoints.size() == 0){
+            MarkerOptions options = new MarkerOptions()
+                    .position(point)
+                    .title("Starting Point!");
+            mMap.addMarker(options);
+        }
 
-        //draw the polyline
-        drawRoute();
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title("I am here!");
-        mMap.addMarker(options);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
+        /*If the user has not paused the run, then get the metrics*/
+        if(isRunning){
+            /*Get Metrics*/
+            geoPoints.add(point);
+            route.setPoints(geoPoints);
+            mRunSpeedText.setText((location.getSpeed() + " m/s"));
+            if(geoPoints.size() > 1){
+                mRunDistText.setText(getNewDistance() + " miles");
+            }
+
+        }
+
     }
 
     /*
     *Methods to calculate metrics. All measurements returned are approximations.
      */
-    //returns the latest distance between geoPoints. Append to total number
-    public void calculateDistance(){
-        //Location newLoc = new Location("Latest Location");
-        //Location oldLoc = new Location("Last known Location");
-        //LatLng newPt = geoPoints.get(geoPoints.size()- 1);
-        //LatLng oldPt = geoPoints.get(geoPoints.size()-2);
-        //distances.add(oldLoc.distanceTo(newLoc));
-        //add to the distance variable
-        //totalDistance = totalDistance + oldLoc.distanceTo(newLoc);
-        //Log.d(TAG, "distance between points is: " + oldLoc.distanceTo(newLoc));
+
+    //returns the latest distance between geoPoints. Append to total number. Multiplier returns distance in miles
+    public Double getNewDistance(){
+        float[] results = new float[1];
+        LatLng prev = geoPoints.get(geoPoints.size()-2);
+        LatLng latest = geoPoints.get(geoPoints.size()-1);
+        Location.distanceBetween(prev.latitude, prev.longitude, latest.latitude, latest.longitude, results);
+        Float res = results[0] * 0.000621371192f;
+        Double dist = res.doubleValue();
+        Log.d(TAG, "New distance is: " + dist);
+        distances.add(dist);
+        return calcDistance();
+    }
+
+    //Get the total distance so far
+    public Double calcDistance(){
+        Double sum = 0.0;
+        for(int i = 0; i < distances.size();i++){
+            sum+=distances.get(i);
+        }
+        return sum;
     }
 
     //calculates the current KCals being burned
-    public void calculateKcals(){
+    public void calculateCals(){
         /*TODO: FILL THIS MOTHERFUCKER IN*/
+
+    }
+
+    /*Method to update the screen on each location poll*/
+    public void update(LatLng point){
 
     }
 
@@ -317,22 +321,21 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         return todaysDate;
     }
 
-    /*TODO: FIX THIS MOTHERFUCKER*/
-    public void drawRoute(){
-        mMap.clear();
-        PolylineOptions options = new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true);
-        for(int i = 0; i < geoPoints.size(); i++){
-            LatLng pt = geoPoints.get(i);
-            options.add(pt);
-        }
-        Log.d(TAG, "GeoPoints recorded: " + geoPoints);
-        mMap.addPolyline(options);
+
+    /*------------------FINISHED CONTENT FOR JUST THE REGULAR RUN-------------------*/
+
+    /*THIS METHOD IS ONLY FOR THE NON-CHALLENGE RUNS */
+    //TODO implement this
+    /*Save the run in the backend*/
+    protected void saveRun(double dist, double time, double kcals){
+        Run run = new Run(mCurrentUser,dist,time,kcals);
     }
 
     /*STOP HERE IF THIS VERSION IS UPDATED TO REPLACE THE REGULAR RUNNING VERSION
     * }*/
 
-    /*Create Alert Dialog to pick challenger*/
+    /*Create Alert Dialog to pick challenger
+    * Displays a list of the user's friends and allows them to select one friend to send the challenge to*/
     public void createDialog(){
         final AlertDialog.Builder challengeBuilder = new AlertDialog.Builder(ChallengeRunActivty.this);
         challengeBuilder.setTitle("Pick a Friend to Challenge");
@@ -364,15 +367,15 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                             Log.d(TAG, e.toString());
                         } else {
                             Log.d(TAG, "saved");
+                            Log.d("PUSH", "Push send to: " + contender.getUsername());
                             sendPushNotification(contender, mCurrentUser);
 
                             //The line below is simply for testing purposes
-                            sendPushNotification(mCurrentUser,mCurrentUser);
+                            //sendPushNotification(mCurrentUser,mCurrentUser);
 
                         }
                     }
                 });
-                //mChalRelationSend.add(chal);
                 Log.d(TAG, "Contender is: " + mFriends.get(pos).toString());
                 Toast.makeText(getApplicationContext(), "You have sent a challenge to " + mFriends.get(pos).getUsername() + "!", Toast.LENGTH_SHORT).show();
             }
@@ -413,9 +416,9 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
     /*Send a notification to a user that they have been challenged
     * @param the parse user to send notification to*/
-    protected  void sendPushNotification(ParseUser cont, ParseUser chal){
+    protected void sendPushNotification(ParseUser cont, ParseUser chal){
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
-        query.whereEqualTo(ParseConstants.KEY_USER_ID,cont.getObjectId());
+        query.whereEqualTo(ParseConstants.KEY_USER_ID, cont.getObjectId());
 
         ParsePush push = new ParsePush();
         push.setQuery(query);
@@ -423,5 +426,6 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         push.sendInBackground();
 
     }
+
 
 }

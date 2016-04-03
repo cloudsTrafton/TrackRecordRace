@@ -30,17 +30,7 @@ public class ChallengeFragment extends Fragment {
     public static final String TAG = "CHALLENGEFRAGMENT";
     Button mNewChallengeButton;
     ParseUser mCurrentUser = ParseUser.getCurrentUser();
-
-
-    Challenge test = new Challenge(mCurrentUser,40,mCurrentUser,30);
-    //List<Challenge> mChallenges = Arrays.asList(test);
     List<Challenge> mChallenges = new ArrayList<Challenge>();
-    //mChallenges.add(test);
-
-
-    /* Make a dummy challenge*/
-
-
 
     private RecyclerView mChallengeList;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -63,8 +53,6 @@ public class ChallengeFragment extends Fragment {
         mChallengeList = (RecyclerView) rootView.findViewById(R.id.SentChallengeCardList);
         mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
 
-        //RecyclerView recList = (RecyclerView) rootView.findViewById(R.id.RecChallengeCardList);
-
 
         mNewChallengeButton = (Button) rootView.findViewById(R.id.new_challenge_button);
         mNewChallengeButton.setOnClickListener(new View.OnClickListener() {
@@ -75,8 +63,7 @@ public class ChallengeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        //getChallenges();
-        //Test dummy challange
+
         return rootView;
     }
 
@@ -101,26 +88,24 @@ public class ChallengeFragment extends Fragment {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
-                if (e == null){
+                if (e == null) {
                     Integer test = objects.size();
                     Log.d(TAG, "Number returned: " + test.toString());
-                    if(objects.size() == 0){
+                    if (objects.size() == 0) {
                         //Display a message saying you have no challenges at this time
-                    }
-                    else {
+                    } else {
                         /*Parse each object into a readable format*/
-                        for(int i = 0; i < objects.size(); i++){
+                        for (int i = 0; i < objects.size(); i++) {
                             ParseObject item = objects.get(i);
                             ParseUser challenger = (ParseUser) item.get("Challenger");
                             ParseUser contender = (ParseUser) item.get("Contender");
-                            double chalTime = (double) item.get("ChallengerTime");
-                            double distance = (double) item.get("Distance");
+                            double chalTime = castInt((Number) item.get("ChallengerTime"));
+                            double distance = castInt((Number) item.get("Distance"));
                             Date createdAt = (Date) item.getCreatedAt();
-                            Log.d(TAG,"Challenger: " + challenger.getUsername());
-                            Challenge temp = new Challenge(challenger,chalTime,contender,distance,createdAt);
+                            Log.d(TAG, "Challenger: " + challenger.getUsername());
+                            Challenge temp = new Challenge(challenger, chalTime, contender, distance, createdAt);
                             mChallenges.add(temp);
                         }
-                        //mChallenges.addAll(objects);
 
                     }
 
@@ -128,9 +113,8 @@ public class ChallengeFragment extends Fragment {
                     mChallengeList.setLayoutManager(mLayoutManager);
                     mChallengeList.setAdapter(mAdapter);
                     Integer size = mChallenges.size();
-                    Log.d(TAG,size.toString());
-                }
-                else {
+                    Log.d(TAG, size.toString());
+                } else {
                     /*There must have been a problem*/
                     Log.d(TAG, e.toString());
                 }
@@ -138,5 +122,12 @@ public class ChallengeFragment extends Fragment {
         });
 
     }
+
+    /*In the case that Parse passes whole numbers, use division to cast these to doubles*/
+    public double castInt(Number j){
+        double num = j.doubleValue();
+        return num;
+    }
+
 
 }

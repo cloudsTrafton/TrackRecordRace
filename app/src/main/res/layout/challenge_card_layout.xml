@@ -17,7 +17,7 @@
             android:background="@color/colorPrimary"
             android:text=" Challenge w/ user on"
             android:gravity="center_vertical"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:textColor="@android:color/white"
             android:textSize="18dp"/>
 

@@ -48,5 +48,6 @@
     <string name="title_activity_challenge_flow">ChallengeFlowActivity</string>
     <string name="title_activity_edit_friends">View and Add Friends</string>
     <string name="title_activity_search_friend">Add Friend</string>
+    <string name="title_activity_challenge_response_run">ChallengeResponseRunActivity</string>
 
 </resources>

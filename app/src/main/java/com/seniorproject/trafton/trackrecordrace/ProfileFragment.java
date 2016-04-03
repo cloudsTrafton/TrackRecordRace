@@ -31,9 +31,10 @@ public class ProfileFragment extends Fragment {
         //Get the user data
         ParseUser currentUser = ParseUser.getCurrentUser();
         String mUsername = currentUser.getUsername().toString();
-        TextView txtuser = (TextView) rootView.findViewById(R.id.txtuser);
-        txtuser.setText("Welcome, " + mUsername + "!");
-
+        TextView myRunsLabel = (TextView) rootView.findViewById(R.id.my_stuff_label);
+        TextView myChallengesLabel = (TextView) rootView.findViewById(R.id.challenge_stuff_label);
+        myRunsLabel.setText(mUsername + "'s" + " Run Stats");
+        myChallengesLabel.setText(mUsername + "'s" + " Challenge Stats");
         return rootView;
     }
 

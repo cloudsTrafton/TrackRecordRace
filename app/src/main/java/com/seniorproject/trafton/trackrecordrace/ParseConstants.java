@@ -8,4 +8,8 @@ public class ParseConstants {
     public static final String KEY_USER_ID = "UserID";
     public static final String KEY_SELF_CONTENDER = "Contender";
     public static final String KEY_SELF_CHALLENGER = "Challenger";
+
+    /*Intent keys*/
+    public static final String BUNDLE_DISTANCE = "DISTANCE";
+    public static final String BUNDLE_TIME = "TIME";
 }

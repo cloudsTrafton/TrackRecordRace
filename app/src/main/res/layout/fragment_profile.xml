@@ -2,31 +2,86 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingTop="10dp"
                 tools:context="com.seniorproject.trafton.trackrecordrace.ProfileFragment">
 
-
     <TextView
-        android:id="@+id/txtuser"
-        android:layout_width="wrap_content"
+        android:id="@+id/my_stuff_label"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="50dp"
-        android:paddingBottom="50dp"
-        android:layout_centerHorizontal="true" />
+        android:text="My Run Stats"
+        android:textSize="18dp"
+        android:textColor="@android:color/white"
+        android:padding="10dp"
+        android:background="@color/colorPrimary"
+        android:layout_below="@id/txtuser"
+        android:layout_alignParentLeft="true" />
     <TextView
         android:id="@+id/runs_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Number of Runs: "
-        android:layout_below="@id/txtuser"
-        android:paddingTop="50dp"
-        android:layout_centerHorizontal="true" />
+        android:textSize="15dp"
+        android:layout_below="@id/my_stuff_label"
+        android:padding="10dp"
+        android:layout_alignParentLeft="true" />
     <TextView
-        android:id="@+id/races_user"
+        android:id="@+id/runs_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Number of Races: "
+        android:text="best time"
+        android:textSize="15dp"
         android:layout_below="@id/runs_user"
-        android:paddingTop="50dp"
-        android:layout_centerHorizontal="true" />
+        android:padding="10dp"
+        android:layout_alignParentLeft="true" />
+    <TextView
+        android:id="@+id/runs_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="longest run"
+        android:textSize="15dp"
+        android:layout_below="@id/runs_time"
+        android:padding="10dp"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:id="@+id/challenge_stuff_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My Challenge Stats"
+        android:textSize="18dp"
+        android:textColor="@android:color/white"
+        android:padding="10dp"
+        android:background="@color/colorPrimary"
+        android:layout_below="@id/runs_distance"
+        android:layout_alignParentLeft="true" />
+    <TextView
+        android:id="@+id/challenge_wins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My wins"
+        android:textSize="15dp"
+        android:layout_below="@id/challenge_stuff_label"
+        android:padding="10dp"
+        android:layout_alignParentLeft="true" />
+    <TextView
+        android:id="@+id/challenge_losses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="My losses"
+        android:textSize="15dp"
+        android:layout_below="@id/challenge_wins"
+        android:padding="10dp"
+        android:layout_alignParentLeft="true" />
+    <TextView
+        android:id="@+id/challenges_pending_profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pending sent challenges"
+        android:textSize="15dp"
+        android:layout_below="@id/challenge_losses"
+        android:padding="10dp"
+        android:layout_alignParentLeft="true" />
+
 
 </RelativeLayout>

@@ -59,7 +59,7 @@ public class LoginSignupActivity extends AppCompatActivity {
                                             MainTabsActivity.class);
                                     startActivity(intent);
                                     Toast.makeText(getApplicationContext(),
-                                            "Successfully Logged in",
+                                            "Welcome!",
                                             Toast.LENGTH_LONG).show();
                                     finish();
                                 } else {

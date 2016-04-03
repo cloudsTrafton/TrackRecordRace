@@ -1,6 +1,7 @@
 package com.seniorproject.trafton.trackrecordrace;
 
 import android.content.ClipData;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,11 +18,38 @@ import java.util.List;
  */
 public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdapter.ViewHolder> {
     //itemsData contains each challenge
-    private List<Challenge> itemsData;
-
+    protected List<Challenge> itemsData;
     public ChallengeListAdapter(List<Challenge> itemsData) {
         this.itemsData = itemsData;
     }
+
+    /*---------------------------- */
+    // inner class to hold a reference to each item of RecyclerView
+    //Context is needed for intents to accept or decline a challenge
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView titleText;
+        public TextView distanceText;
+        public TextView theirTimeText;
+        public Button goChallengeButton;
+        public Button deleteChallengeButton;
+
+        public ClipData.Item currentItem;
+
+        public ViewHolder(View itemLayoutView) {
+            super(itemLayoutView);
+
+            titleText = (TextView) itemLayoutView.findViewById(R.id.title_text);
+            distanceText = (TextView) itemLayoutView.findViewById(R.id.distance_text);
+            theirTimeText = (TextView) itemLayoutView.findViewById(R.id.their_time_text);
+            goChallengeButton = (Button) itemLayoutView.findViewById(R.id.go_challenge_button);
+            deleteChallengeButton = (Button) itemLayoutView.findViewById(R.id.delete_challenge_button);
+
+
+        }
+
+    }
+    /*------------------------------------------------*/
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -41,58 +69,40 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdap
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
-        // - get data from your itemsData at this position
-        // - replace the contents of the view with that itemsData
-        //viewHolder.titleText.setText("Challenge sent to " + itemsData.get(position).getContender().getUsername() + " on " + itemsData.get(position).getCreatedAt().toString());
         viewHolder.titleText.setText(" Challenge sent by " + itemsData.get(position).getChallenger().getUsername() + " on " + itemsData.get(position).getCreatedOn());
         viewHolder.distanceText.setText("Distance: " + itemsData.get(position).getDistance() + " miles");
         viewHolder.theirTimeText.setText("Their Time: " + itemsData.get(position).getChalTime() + " mins");
-        /*if (itemsData.get(position).getConTime() == 0){
-            viewHolder.myTimeText.setText("Their Time: Pending");
-        }
-        else {
-            viewHolder.myTimeText.setText("Their Time: " + itemsData.get(position).getConTime());
-        } */
 
+        /*Get the metrics for clicking the buttons!*/
+        final String distIntent = viewHolder.distanceText.getText().toString().replaceAll("[^\\d.]", "");
+        Log.d("CHALLENGEADAPTER", "sending: " + distIntent);
+        final String timeIntent = viewHolder.theirTimeText.getText().toString().replaceAll("[^\\d.]", "");
+        Log.d("CHALLENGEADAPTER", "sending: " + timeIntent);
 
+        /*Checks for a button click*/
+        viewHolder.goChallengeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("CHALLENGEADAPTER", "send button was clicked!");
+                //TODO:When the button is clicked, sent a bundle of data in an intent
+                Intent intent = new Intent(v.getContext(), ChallengeResponseRunActivity.class);
+                intent.putExtra(ParseConstants.BUNDLE_DISTANCE, distIntent);
+                intent.putExtra(ParseConstants.BUNDLE_TIME, timeIntent);
+                v.getContext().startActivity(intent);
+            }
+        });
+
+            /*If the user wishes to delete the challenge, they will get a loss*/
+        viewHolder.deleteChallengeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO:When the button is clicked, remove the challenge from Parse, add a loss to the user
+            }
+        });
 
     }
 
-    // inner class to hold a reference to each item of RecyclerView
-    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView titleText;
-        public TextView distanceText;
-        public TextView theirTimeText;
-        public Button goChallengeButton;
-        public Button deleteChallengeButton;
-
-        public ClipData.Item currentItem;
-
-
-        public ViewHolder(View itemLayoutView) {
-            super(itemLayoutView);
-            titleText = (TextView) itemLayoutView.findViewById(R.id.title_text);
-            distanceText = (TextView) itemLayoutView.findViewById(R.id.distance_text);
-            theirTimeText = (TextView) itemLayoutView.findViewById(R.id.their_time_text);
-            goChallengeButton = (Button) itemLayoutView.findViewById(R.id.go_challenge_button);
-            deleteChallengeButton = (Button) itemLayoutView.findViewById(R.id.delete_challenge_button);
-
-
-        }
-
-        //@Override
-        public void onBindViewHolder(ViewHolder viewHolder, int i) {
-            viewHolder.goChallengeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //TODO:When the button is clicked, sent a bundle of data in an intent
-                }
-            });
-
-        }
-    }
-    //End inner class for viewHolder
 
 
     // Return the size of your itemsData (invoked by the layout manager)
