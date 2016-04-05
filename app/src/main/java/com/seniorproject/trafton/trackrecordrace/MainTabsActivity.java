@@ -67,7 +67,7 @@ public class MainTabsActivity extends AppCompatActivity {
                 //Begin a new RunActivity
                Intent intent = new Intent(
                         MainTabsActivity.this,
-                        MapsActivity.class);
+                        IndividualRunActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.action_edit_friends:
@@ -75,6 +75,15 @@ public class MainTabsActivity extends AppCompatActivity {
                         MainTabsActivity.this,
                         EditFriendsActivity.class);
                 startActivity(friendsIntent);
+                return true;
+            case R.id.action_settings:
+                //Go to settings activity
+                //Move edit friends activity to here
+                return true;
+            case R.id.action_help:
+                Intent helpIntent = new Intent(MainTabsActivity.this,
+                        HelpActivity.class);
+                startActivity(helpIntent);
                 return true;
             case R.id.action_logout:
                 //log the user out and close the application
@@ -90,7 +99,7 @@ public class MainTabsActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new ProfileFragment(), "Profile");
-        adapter.addFragment(new StatsFragment(), "Statistics");
+        adapter.addFragment(new MyRunsFragment(), "Runs");
         adapter.addFragment(new ChallengeFragment(), "Challenges");
         viewPager.setAdapter(adapter);
     }

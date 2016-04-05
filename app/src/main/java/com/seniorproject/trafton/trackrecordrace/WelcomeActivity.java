@@ -53,7 +53,7 @@ public class WelcomeActivity extends Activity {
             public void onClick(View arg0) {
                 Intent intent = new Intent(
                         WelcomeActivity.this,
-                        MapsActivity.class);
+                        IndividualRunActivity.class);
                 startActivity(intent);
 
 

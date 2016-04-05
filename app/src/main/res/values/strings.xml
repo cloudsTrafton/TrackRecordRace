@@ -49,5 +49,11 @@
     <string name="title_activity_edit_friends">View and Add Friends</string>
     <string name="title_activity_search_friend">Add Friend</string>
     <string name="title_activity_challenge_response_run">ChallengeResponseRunActivity</string>
+    <string name="title_activity_help_fragment">HelpFragment</string>
+
+    <string name="location_message_title">Location services not enabled</string>
+    <string name="location_message">You cannot record your metrics without location services.\nTurn on location services now?</string>
+    <string name="affirmative">OK</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

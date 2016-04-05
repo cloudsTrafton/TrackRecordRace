@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,51 +25,40 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.parse.ParseUser;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class MapsActivity extends AppCompatActivity implements LocationProvider.LocationCallback {
+public class IndividualRunActivity extends AppCompatActivity implements LocationProvider.LocationCallback {
 
-
-    public static final String TAG = "cloudsTraf";
-            //MapsActivity.class.getSimpleName();
-    private ParseUser mCurrentUser;
-
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    public static final String TAG = "INDIVIDUALRUN";
+    private GoogleMap mMap;
     private LocationProvider mLocationProvider;
-    //variable for toggle buttons
+    protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
+    double weight = mCurrentUser.getDouble(ParseConstants.KEY_USER_WEIGHT);
+
+    private ArrayList<LatLng> geoPoints = new ArrayList<LatLng>();
+    private ArrayList<Double> distances = new ArrayList<Double>();
+    private ArrayList<Double> speeds = new ArrayList<Double>();
+    protected DecimalFormat df = new DecimalFormat("#.##");
+
+    CalorieCalc calorieCounter = new CalorieCalc(weight);
+    protected Double calories = 0.0;
     private boolean isRunning = false;
-    //ArrayList to store geopoints for current run
-    private ArrayList<LatLng> geoPoints;
-    //Array of distances
-    private ArrayList<Float> distances;
-
-    private double totalDistance;
-    private double calories;
-
-    //polyline that represented the route
-    Polyline tracker;
-
-    /*Load up widgets for tracking */
-    private ImageButton mPlayButton;
-    private ImageButton mPauseButton;
+    protected int seconds;
 
     private TextView mRunTimeText;
     private TextView mRunSpeedText;
     private TextView mRunDistText;
     private TextView mRunCalsText;
 
-    private Boolean mIsPlayButtonClicked;
-
-    //Handler to control timer tracking
+    /*------------------Handle Timer--------------------------------*/
     //Thank you to Nikos Maravitsas for the tutorial on timers
-
     private Handler timeHandler = new Handler();
 
     private long startTime = 0L;
@@ -78,24 +66,43 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
     long timeSwapBuffer = 0L;
     long updatedTime = 0L;
 
+    /*Code to update the timer, begins a new timer thread.*/
+    private Runnable updateTimerThread = new Runnable() {
+        public void run(){
+            timeInMillis = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuffer + timeInMillis;
 
+            //Get integer value from time update and put into textView
+            seconds = (int) (updatedTime/1000);
+            //need two seconds variables for formatting purposes.
+            int secs = seconds % 60;
+            int mins = (seconds / 60);
+            int hours = (mins / 60);
 
+            mRunTimeText.setText("" + hours + ":" +
+                    String.format("%02d", mins) + ":" +
+                    String.format("%02d", secs));
+            timeHandler.postDelayed(this, 0);
+        }
+
+    };
+    /*__________________End Timer Code-----------------------------*/
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*DONE: change the layout slightly so that it includes the ability to send a challenge*/
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-
         mLocationProvider = new LocationProvider(this, this);
-        geoPoints = new ArrayList<LatLng>(); //added
-        mCurrentUser = ParseUser.getCurrentUser();
+
 
         //Add in code to inflate the tracking modules
         mRunTimeText = (TextView) findViewById(R.id.run_time_text);
         mRunDistText = (TextView) findViewById(R.id.run_dist_text);
         mRunSpeedText = (TextView) findViewById(R.id.run_speed_text);
+        mRunCalsText = (TextView) findViewById(R.id.run_kcals_text);
 
         Toolbar runToolbar= (Toolbar) findViewById(R.id.toolbar_run);
         runToolbar.setTitle("Run on " + getDate());
@@ -111,7 +118,7 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
         return super.onCreateOptionsMenu(menu);
     }
 
-    //Handles possibilities of menu items being selected.
+    /*Handles possibilities of menu items being selected. Play and stop buttons control tracking */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -123,6 +130,7 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
                     item.setIcon(R.drawable.ic_pause_white_24dp);
                     isRunning = true;
                 }
+
                 else {
                     timeSwapBuffer += timeInMillis;
                     timeHandler.removeCallbacks(updateTimerThread);
@@ -131,9 +139,10 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
 
                 }
                 return true;
+            case R.id.action_stop_run:;
 
-            case R.id.action_stop_run:
-                //stop run, save run, and transport user to the stats for that run
+                //TODO add this to the individual running portion
+                //saveRun(getNewDistance(),seconds,calories);
 
                 return true;
             default:
@@ -141,34 +150,16 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
         }
     }
 
-    /*Code to update the timer, begins a new timer thread.*/
-    private Runnable updateTimerThread = new Runnable() {
-        public void run(){
-            timeInMillis = SystemClock.uptimeMillis() - startTime;
-            updatedTime = timeSwapBuffer + timeInMillis;
+    /* --------- */
 
-            //Get integer value from time update and put into textView
-            int seconds = (int) (updatedTime/1000);
-            //need two seconds variables for formatting purposes.
-            int secs = seconds % 60;
-            int mins = (seconds / 60);
-            int hours = (mins / 60);
 
-            mRunTimeText.setText("" + hours + ":" +
-                    String.format("%02d", mins) + ":" +
-                    String.format("%02d", secs));
-            timeHandler.postDelayed(this, 0);
-        }
-
-    };
-
-    /* */
-
+    /*---------- */
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
         mLocationProvider.connect();
+
     }
 
     @Override
@@ -192,8 +183,9 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
      * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
      * method in {@link #onResume()} to guarantee that it will be called.
      */
+
+    /*Check to make sure that the map is not null*/
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
@@ -209,64 +201,94 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        /*Void for now...*/
     }
 
-    //handle new location
+    /*---------------------------HANDLE NEW LOCATION---------------------------------------*/
+    /*This method does a lot of the heavy lifting and updates the metrics as well as the views*/
+
     public void handleNewLocation(Location location) {
         Log.d(TAG, location.toString());
 
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+        LatLng point = new LatLng(currentLatitude, currentLongitude);
 
-        /*Get the new geopoints for each time handleNewLocation is called
-        * This will help update speed and distance as well*/
-        geoPoints.add(latLng);
+        Double currentSpeed = toMPH(location.getSpeed());
+        float currentSpeedMetersPerMinute = location.getSpeed() * 60;
 
-        /*If the user has not paused the run, then get the metrics*/
-        if(isRunning){
-            mRunSpeedText.setText((location.getSpeed() + " m/s"));
-            //draw the polyline
-            drawRoute();
-            MarkerOptions options = new MarkerOptions()
-                    .position(latLng)
-                    .title("I am here!");
+        /*If this is the first location, then create a marker for the starting point*/
+        if(geoPoints.size()==1){
+            MarkerOptions options = new MarkerOptions().position(geoPoints.get(0)).title("Starting Point!");
             mMap.addMarker(options);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         }
 
 
+        /*If the user has not paused the run, then get the metrics*/
+        if(isRunning){
+            geoPoints.add(point);
+            speeds.add(currentSpeed);
 
+            /*Redraw the polyline on the map*/
+            PolylineOptions routeOptions = new PolylineOptions().addAll(geoPoints).color(R.color.ColorPolyline).width(10).visible(true);
+            mMap.addPolyline(routeOptions);
 
-
+            /*---------UPDATE VIEWS---------*/
+            if(geoPoints.size() > 1){
+                mRunDistText.setText(df.format(getNewDistance()) + " miles");
+            }
+            mRunSpeedText.setText((df.format(currentSpeed)) + " miles/hour");
+            if (currentSpeed != 0){
+                mRunCalsText.setText(df.format(calories));
+                calories += calorieCounter.getCaloriesVO2(currentSpeedMetersPerMinute);
+            }
+            else {
+                //Do not update
+            }
+            /*---------FINISH UPDATING VIEWS---------*/
+        }
+        else {
+            mRunSpeedText.setText("0 miles/hour");
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
     }
 
-    /*
-    *Methods to calculate metrics. All measurements returned are approximations.
-     */
+    /*------------------------END HANDLE NEW LOCATION---------------------------------------------*/
 
-    /*Calculates distance using Haversine formula*/
-    public void calculateDistance(){
-        //Location newLoc = new Location("Latest Location");
-        //Location oldLoc = new Location("Last known Location");
-        //LatLng newPt = geoPoints.get(geoPoints.size()- 1);
-        //LatLng oldPt = geoPoints.get(geoPoints.size()-2);
-        //distances.add(oldLoc.distanceTo(newLoc));
-        //add to the distance variable
-        //totalDistance = totalDistance + oldLoc.distanceTo(newLoc);
-        //Log.d(TAG, "distance between points is: " + oldLoc.distanceTo(newLoc));
+    /*-------------------------Get the Metrics----------------------------------------------------*/
+
+    //returns the latest distance between geoPoints. Append to total number. Multiplier returns distance in miles
+    public Double getNewDistance(){
+        float[] results = new float[1];
+        LatLng prev = geoPoints.get(geoPoints.size()-2);
+        LatLng latest = geoPoints.get(geoPoints.size()-1);
+        Location.distanceBetween(prev.latitude, prev.longitude, latest.latitude, latest.longitude, results);
+        Float res = results[0] * 0.000621371192f;
+        Double dist = res.doubleValue();
+        Log.d(TAG, "New distance is: " + dist);
+        distances.add(dist);
+        return calcDistance();
     }
 
-    //calculates the current KCals being burned
-    public void calculateKcals(){
-
+    //Get the total distance so far
+    public Double calcDistance(){
+        Double sum = 0.0;
+        for(int i = 0; i < distances.size();i++){
+            sum+=distances.get(i);
+        }
+        return sum;
     }
 
-    /*Create instance of this run in Parse database*/
-    protected void saveRun(double dist, double time, double kcals){
-        Run run = new Run(mCurrentUser,dist,time,kcals);
+    /*Method to update the screen on each location poll
+    * Returns the speed as a Double*/
+    public Double toMPH(float val){
+        Float valTemp = val;
+        Double mps = valTemp.doubleValue();
+        mps = mps * 2.23694;
+        return mps;
+
     }
+    /*-------------------------Get the Metrics----------------------------------------------------*/
 
     //get today's date in a simple format
     public String getDate(){
@@ -276,15 +298,13 @@ public class MapsActivity extends AppCompatActivity implements LocationProvider.
         return todaysDate;
     }
 
-    //method to draw polyline. Uses the recorded geopoints.
-    public void drawRoute(){
-        mMap.clear();
-        PolylineOptions options = new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true);
-        for(int i = 0; i < geoPoints.size(); i++){
-            LatLng pt = geoPoints.get(i);
-            options.add(pt);
-        }
-        Log.d(TAG,"GeoPoints recorded: " + geoPoints);
-        mMap.addPolyline(options);
+    /*THIS METHOD IS ONLY FOR THE NON-CHALLENGE RUNS */
+    protected void saveRun(double dist, double time, double kcals){
+        Run run = new Run(mCurrentUser,dist,time,kcals);
     }
+    /*-----END ONLY FOR NON-CHALLENGE RUNS------------*/
+
+
+
+    /*------------------FINISHED CONTENT FOR JUST THE REGULAR RUN-------------------*/
 }

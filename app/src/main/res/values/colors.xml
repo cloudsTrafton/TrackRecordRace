@@ -6,7 +6,7 @@
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
     <color name="colorAccent">#c8e8ff</color>
-    <color name="ColorDivider">#1a81cb</color>
+    <color name="ColorPolyline">#1a81cb</color>
     <color name="colorDecline">#ffe6e6</color>
     <color name="buttonText">#595959</color>
 </resources>

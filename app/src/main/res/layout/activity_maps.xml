@@ -22,7 +22,7 @@
               android:layout_width="match_parent"
               android:layout_height="250sp"
               android:layout_below="@id/toolbar_run"
-              tools:context="com.seniorproject.trafton.trackrecordrace.MapsActivity"
+              tools:context="com.seniorproject.trafton.trackrecordrace.IndividualRunActivity"
               android:name="com.google.android.gms.maps.SupportMapFragment"/>
 
 

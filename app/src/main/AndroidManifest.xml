@@ -68,7 +68,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".IndividualRunActivity"
             android:label="@string/title_activity_maps"
             android:theme="@style/MyMaterialTheme" >
         </activity>
@@ -130,7 +130,11 @@
         <activity
             android:name=".ChallengeResponseRunActivity"
             android:label="@string/title_activity_challenge_response_run"
-            android:theme="@style/MyMaterialTheme">
+            android:theme="@style/MyMaterialTheme" >
+        </activity>
+        <activity
+            android:name=".HelpActivity"
+            android:label="@string/title_activity_help_fragment" >
         </activity>
     </application>
 

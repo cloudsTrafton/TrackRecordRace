@@ -6,9 +6,13 @@ package com.seniorproject.trafton.trackrecordrace;
  */
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -85,7 +89,8 @@ public class LocationProvider implements
             mLocationCallback.handleNewLocation(location);
         }
         else {
-            //mLocationCallback.handleNewLocation(location);
+            Log.i(TAG, "couldnt get location");
+            noLocationEnabledDialog();
         }
     }
 
@@ -122,6 +127,29 @@ public class LocationProvider implements
              */
             Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
         }
+    }
+
+    public void noLocationEnabledDialog(){
+            AlertDialog.Builder setLocationDialog = new AlertDialog.Builder(mContext);
+            setLocationDialog.setTitle(R.string.location_message_title);
+            setLocationDialog.setMessage(R.string.location_message);
+
+            /*Button takes user to settings*/
+            setLocationDialog.setPositiveButton(R.string.affirmative, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    mContext.startActivity(settingsIntent);
+                }
+            });
+            /*If no location, close the activity*/
+            setLocationDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //do nothing....yet
+                }
+            });
+        setLocationDialog.show();
     }
 
     @Override

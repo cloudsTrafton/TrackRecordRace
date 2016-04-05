@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.seniorproject.trafton.trackrecordrace.MapsActivity">
+      tools:context="com.seniorproject.trafton.trackrecordrace.IndividualRunActivity">
     <item
         android:id="@+id/action_begin_run"
         android:icon="@drawable/ic_play_arrow_white_24dp"

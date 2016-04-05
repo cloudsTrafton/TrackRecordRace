@@ -31,7 +31,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -51,7 +50,6 @@ import java.util.List;
 
 public class ChallengeRunActivty extends AppCompatActivity implements LocationProvider.LocationCallback {
 
-    //TODO:SAVE EACH MOTHERFUCKING RUN
 
     /*Variables for getting Friends for challenges*/
     public List<ParseUser> mFriends;
@@ -60,9 +58,8 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
     /* THESE ABOVE CAN BE REMOVED IN REGULAR RUNS */
 
     public static final String TAG = "CHALLENGERUN";
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private GoogleMap mMap;
     private LocationProvider mLocationProvider;
-    Polyline route;
     protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
     double weight = mCurrentUser.getDouble(ParseConstants.KEY_USER_WEIGHT);
 
@@ -145,7 +142,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         return super.onCreateOptionsMenu(menu);
     }
 
-    //Handles possibilities of menu items being selected.
+    /*Handles possibilities of menu items being selected. Play and stop buttons control tracking */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -218,15 +215,15 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
      * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
      * method in {@link #onResume()} to guarantee that it will be called.
      */
+
+    /*Check to make sure that the map is not null*/
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
-                route = mMap.addPolyline(new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true));
                 setUpMap();
             }
         }
@@ -249,44 +246,43 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         double currentLongitude = location.getLongitude();
         LatLng point = new LatLng(currentLatitude, currentLongitude);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 20));
-
         Double currentSpeed = toMPH(location.getSpeed());
         float currentSpeedMetersPerMinute = location.getSpeed() * 60;
 
         /*If this is the first location, then create a marker for the starting point*/
-        if(geoPoints.size() == 0){
-            MarkerOptions options = new MarkerOptions()
-                    .position(point)
-                    .title("Starting Point!");
+        if(geoPoints.size()==1){
+            MarkerOptions options = new MarkerOptions().position(geoPoints.get(0)).title("Starting Point!");
             mMap.addMarker(options);
         }
+
 
         /*If the user has not paused the run, then get the metrics*/
         if(isRunning){
             geoPoints.add(point);
-            route.setPoints(geoPoints);
-            route = mMap.addPolyline(new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true));
             speeds.add(currentSpeed);
 
-            calories += calorieCounter.getCaloriesVO2(currentSpeedMetersPerMinute);
+            /*Redraw the polyline on the map*/
+            PolylineOptions routeOptions = new PolylineOptions().addAll(geoPoints).color(R.color.ColorPolyline).width(10).visible(true);
+            mMap.addPolyline(routeOptions);
 
             /*---------UPDATE VIEWS---------*/
             if(geoPoints.size() > 1){
                 mRunDistText.setText(df.format(getNewDistance()) + " miles");
             }
-            mRunSpeedText.setText((df.format(currentSpeed)) + " m/h");
+            mRunSpeedText.setText((df.format(currentSpeed)) + " miles/hour");
             if (currentSpeed != 0){
                 mRunCalsText.setText(df.format(calories));
+                calories += calorieCounter.getCaloriesVO2(currentSpeedMetersPerMinute);
             }
             else {
                 //Do not update
             }
             /*---------FINISH UPDATING VIEWS---------*/
-
-
         }
-
+        else {
+            mRunSpeedText.setText("0 miles/hour");
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
     }
 
     /*------------------------END HANDLE NEW LOCATION---------------------------------------------*/
