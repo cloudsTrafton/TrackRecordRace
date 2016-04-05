@@ -15,4 +15,6 @@ public class ParseConstants {
 
     /*Individual keys*/
     public static final String KEY_USER_WEIGHT = "weight";
+    public static final String KEY_USER_WINS = "wins";
+    public static final String KEY_USER_LOSSES = "losses";
 }

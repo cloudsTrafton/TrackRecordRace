@@ -33,15 +33,20 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     public static final String TAG = "RESPONSERUN";
     /*Challenge Variables*/
     protected String challengeDistance;
+    protected Double challengeDistanceNum;
     protected String challengeTime;
+    protected Double challengeTimeNum;
     protected TextView mDistanceHackText;
     protected TextView mTimeHackText;
+    protected boolean win;
 
     /*Regular old running variables*/
     private GoogleMap mMap;
     private LocationProvider mLocationProvider;
     protected ParseUser mCurrentUser = ParseUser.getCurrentUser();
     double weight = mCurrentUser.getDouble(ParseConstants.KEY_USER_WEIGHT);
+    double wins = mCurrentUser.getDouble(ParseConstants.KEY_USER_WINS);
+    double losses = mCurrentUser.getDouble(ParseConstants.KEY_USER_LOSSES);
 
     private ArrayList<LatLng> geoPoints = new ArrayList<LatLng>();
     private ArrayList<Double> distances = new ArrayList<Double>();
@@ -98,7 +103,11 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         setContentView(R.layout.activity_challenge_response_run);
         Intent intent = getIntent();
         challengeDistance = intent.getStringExtra(ParseConstants.BUNDLE_DISTANCE);
+        challengeDistanceNum = Double.parseDouble(challengeDistance);
+
         challengeTime = intent.getStringExtra(ParseConstants.BUNDLE_TIME);
+        challengeTimeNum = Double.parseDouble(challengeTime);
+
         mDistanceHackText = (TextView) findViewById(R.id.chal_disthack);
         mDistanceHackText.setText(challengeDistance + " miles");
         mTimeHackText = (TextView) findViewById(R.id.chal_timehack);
@@ -148,7 +157,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
                 }
                 return true;
             case R.id.action_stop_run:;
-
+                //
                 //TODO add this to the individual running portion
                 //saveRun(getNewDistance(),seconds,calories);
 
@@ -275,11 +284,14 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         return calcDistance();
     }
 
-    //Get the total distance so far
+    //Get the total distance so far and check if the runner has completed the proposed distance
     public Double calcDistance(){
         Double sum = 0.0;
         for(int i = 0; i < distances.size();i++){
             sum+=distances.get(i);
+        }
+        if (sum >= challengeDistanceNum){
+            finishResponse();
         }
         return sum;
     }
@@ -304,8 +316,30 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     }
 
     /*THIS METHOD IS ONLY FOR RESPONSE RUNS */
-    protected void finishResponse(){
-        //Do nothing....yet
+
+    /*Displays a dialog if the user tries to stop the run prematurely*/
+    public void stopRun(){
+        isRunning = false;
+        if(calcDistance() < challengeDistanceNum){
+            /*TODO: Display dialog asking if the user would like to quit*/
+        }
+    }
+
+    /*TODO: FINISH LOGIC HERE, SAVE THAT SHIT, SEND PUSH NOTIFICATION */
+    public void finishResponse(){
+        isRunning = false;
+        if(seconds/60 < challengeTimeNum){
+            win = true;
+            mCurrentUser.put(ParseConstants.KEY_USER_WINS, wins + 1);
+            //mCurrentUser.save();
+        }
+        else {
+            win = false;
+            mCurrentUser.put(ParseConstants.KEY_USER_LOSSES,losses+1);
+            //mCurrentUser.save();
+            //add a new loss to their stats
+        }
+
     }
     /*-----END ONLY FOR NON-CHALLENGE RUNS------------*/
 }
