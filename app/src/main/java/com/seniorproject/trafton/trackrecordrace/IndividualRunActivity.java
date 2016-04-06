@@ -7,11 +7,13 @@
 package com.seniorproject.trafton.trackrecordrace;
 
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,7 +29,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -52,6 +57,7 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
     private boolean isRunning = false;
     protected int seconds;
 
+    private Menu menu;
     private TextView mRunTimeText;
     private TextView mRunSpeedText;
     private TextView mRunDistText;
@@ -115,6 +121,7 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
         Log.e("XXX", "Menu created");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_maps_run, menu);
+        this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -140,10 +147,7 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
                 }
                 return true;
             case R.id.action_stop_run:;
-
-                //TODO add this to the individual running portion
-                //saveRun(getNewDistance(),seconds,calories);
-
+                finishRun();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -273,6 +277,10 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
     //Get the total distance so far
     public Double calcDistance(){
         Double sum = 0.0;
+        if (distances.size() == 0){
+            /*In the future, don't allow the saving of a blank run*/
+            return 999.99;
+        }
         for(int i = 0; i < distances.size();i++){
             sum+=distances.get(i);
         }
@@ -299,12 +307,48 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
     }
 
     /*THIS METHOD IS ONLY FOR THE NON-CHALLENGE RUNS */
-    protected void saveRun(double dist, double time, double kcals){
-        Run run = new Run(mCurrentUser,dist,time,kcals);
+    protected void saveRun(){
+        Run run = new Run(mCurrentUser,calcDistance(),seconds/1.0,calories);
+        run.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.d(TAG, e.toString());
+                } else {
+                    Toast.makeText(getApplicationContext(), "Run saved!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
-    /*-----END ONLY FOR NON-CHALLENGE RUNS------------*/
 
+    /*Double check that the runner is finished and pause run while they are deciding*/
+    public void finishRun(){
+        /*Pause the run and update the icon to reflect it*/
+        timeSwapBuffer += timeInMillis;
+        timeHandler.removeCallbacks(updateTimerThread);
+        menu.findItem(R.id.action_begin_run).setIcon(R.drawable.ic_play_arrow_white_24dp);
+        isRunning = false;
 
+        AlertDialog.Builder finishedDialog = new AlertDialog.Builder(IndividualRunActivity.this);
+        finishedDialog.setTitle("Confirm Run Completion?");
+        finishedDialog.setMessage("This will stop and save the current run if you continue.");
+        finishedDialog.setPositiveButton(R.string.cont, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveRun();
+                finish();
+            }
+        });
+        finishedDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startTime = SystemClock.uptimeMillis();
+                timeHandler.postDelayed(updateTimerThread,0);
+                menu.findItem(R.id.action_begin_run).setIcon(R.drawable.ic_pause_white_24dp);
+                isRunning = true;
+            }
+        });
+        finishedDialog.show();
+    }
 
-    /*------------------FINISHED CONTENT FOR JUST THE REGULAR RUN-------------------*/
 }

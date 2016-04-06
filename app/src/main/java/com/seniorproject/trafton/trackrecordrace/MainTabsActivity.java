@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.parse.ParseUser;
 
@@ -137,7 +136,7 @@ public class MainTabsActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        Toast.makeText(getApplicationContext(), "Welcome, " + ParseUser.getCurrentUser().getUsername() + "!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "Welcome, " + ParseUser.getCurrentUser().getUsername() + "!", Toast.LENGTH_LONG).show();
     }
 
 

@@ -55,5 +55,6 @@
     <string name="location_message">You cannot record your metrics without location services.\nTurn on location services now?</string>
     <string name="affirmative">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="cont">Continue</string>
 
 </resources>
