@@ -1,5 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:theme="@style/MyMaterialTheme"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context="com.seniorproject.trafton.trackrecordrace.ChallengeFragment">
@@ -23,6 +25,7 @@
 
 
 </RelativeLayout>
+
 
     <Button
         android:id="@+id/new_challenge_button"

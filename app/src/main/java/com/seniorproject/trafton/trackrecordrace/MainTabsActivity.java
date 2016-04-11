@@ -51,7 +51,7 @@ public class MainTabsActivity extends AppCompatActivity {
     //Inflate the menu for this Activity
     //includes the run button as well as the settings button
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.e("XXX","Menu created");
+        Log.e("XXX", "Menu created");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main_tabs, menu);
         return super.onCreateOptionsMenu(menu);
@@ -68,6 +68,11 @@ public class MainTabsActivity extends AppCompatActivity {
                         MainTabsActivity.this,
                         IndividualRunActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.action_send_challenge:
+                Intent challengeIntent = new Intent(MainTabsActivity.this,
+                        ChallengeRunActivty.class);
+                startActivity(challengeIntent);
                 return true;
             case R.id.action_edit_friends:
                 Intent friendsIntent = new Intent(

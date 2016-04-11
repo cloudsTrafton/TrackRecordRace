@@ -1,0 +1,78 @@
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view_my_runs"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="5dp"
+    android:layout_margin="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:id="@+id/my_run_date_title"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:background="@color/colorPrimary"
+            android:text=" Date"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:textColor="@android:color/white"
+            android:textSize="18dp"/>
+
+        <TextView
+            android:id="@+id/my_run_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5.3 Miles"
+            android:gravity="center_vertical"
+            android:textSize="15dp"
+            android:layout_below="@id/my_run_date_title"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"/>
+
+        <TextView
+            android:id="@+id/my_run_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30:00 minutes"
+            android:gravity="center_vertical"
+            android:textSize="15dp"
+            android:layout_below="@id/my_run_distance"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"/>
+        <RelativeLayout
+            android:layout_below="@id/my_run_date_title"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/my_pace_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8:00 min/mile"
+                android:gravity="center_vertical"
+                android:textSize="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"/>
+            <TextView
+                android:id="@+id/my_cals_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="300 Calories burned"
+                android:gravity="center_vertical"
+                android:layout_below="@id/my_pace_text"
+                android:textSize="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"/>
+
+        </RelativeLayout>
+
+
+
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

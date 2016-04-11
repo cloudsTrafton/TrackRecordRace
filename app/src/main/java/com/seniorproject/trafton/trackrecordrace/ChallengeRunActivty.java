@@ -129,7 +129,9 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
         /*DONE: When the run is stopped, open up a new activity that allows a user to pick a friend to send a challenge to. */
         Toolbar runToolbar= (Toolbar) findViewById(R.id.toolbar_run);
-        runToolbar.setTitle("Challenge run on " + getDate());
+        runToolbar.setTitle("Challenge Run");
+        runToolbar.setSubtitle(getDate());
+        runToolbar.setSubtitleTextColor(Color.WHITE);
         runToolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(runToolbar);
     }

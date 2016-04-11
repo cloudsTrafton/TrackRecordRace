@@ -9,9 +9,21 @@
           app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_send_challenge"
+        android:icon="@drawable/flag_checkered_24dp"
+        android:title="Send Challenge"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_edit_friends"
         android:icon="@drawable/ic_group_white_24dp"
         android:title="Edit Friends"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings_white_24dp"
+        android:title="Settings"
         app:showAsAction="ifRoom"/>
 
     <item
@@ -25,11 +37,6 @@
           android:icon="@drawable/logout"
           android:title="Logout"
           app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/ic_settings_white_24dp"
-        android:title="Settings"
-        app:showAsAction="always"/>
 
 
 

@@ -111,7 +111,9 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
         mRunCalsText = (TextView) findViewById(R.id.run_kcals_text);
 
         Toolbar runToolbar= (Toolbar) findViewById(R.id.toolbar_run);
-        runToolbar.setTitle("Run on " + getDate());
+        runToolbar.setTitle("Individual Run");
+        runToolbar.setSubtitle(getDate());
+        runToolbar.setSubtitleTextColor(Color.WHITE);
         runToolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(runToolbar);
     }
@@ -251,6 +253,7 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
             }
             /*---------FINISH UPDATING VIEWS---------*/
         }
+        //If not running
         else {
             mRunSpeedText.setText("0 miles/hour");
         }
@@ -321,7 +324,8 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
         });
     }
 
-    /*Double check that the runner is finished and pause run while they are deciding*/
+    /*Double check that the runner is finished and pause run while they are deciding
+    * Time is stored in seconds, distance in miles,cals in kcals*/
     public void finishRun(){
         /*Pause the run and update the icon to reflect it*/
         timeSwapBuffer += timeInMillis;

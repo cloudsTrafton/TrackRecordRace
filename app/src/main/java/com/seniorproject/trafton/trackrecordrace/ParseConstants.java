@@ -12,6 +12,7 @@ public class ParseConstants {
     /*Intent keys*/
     public static final String BUNDLE_DISTANCE = "DISTANCE";
     public static final String BUNDLE_TIME = "TIME";
+    public static final String BUNDLE_CHALLENGER = "CHALLENGER";
 
     /*Individual keys*/
     public static final String KEY_USER_WEIGHT = "weight";

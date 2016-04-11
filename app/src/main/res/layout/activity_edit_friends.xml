@@ -15,12 +15,22 @@
         app:layout_scrollFlags="scroll|enterAlways"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
+    <TextView
+        android:id="@+id/my_friends_label_edit_friends"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:textSize="26dp"
+        android:layout_below="@id/toolbar_edit_friends"
+        android:text="My Friends"/>
+
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/friends_recycle_view"
-        android:layout_below="@id/toolbar_edit_friends"
         android:layout_width="match_parent"
-        android:scrollbars="vertical"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/my_friends_label_edit_friends"
+        android:scrollbars="vertical"/>
 
 
 

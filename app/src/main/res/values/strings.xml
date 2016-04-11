@@ -46,7 +46,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_send_challenge">SendChallengeActivity</string>
     <string name="title_activity_challenge_flow">ChallengeFlowActivity</string>
-    <string name="title_activity_edit_friends">View and Add Friends</string>
+    <string name="title_activity_edit_friends">Edit Friends</string>
     <string name="title_activity_search_friend">Add Friend</string>
     <string name="title_activity_challenge_response_run">ChallengeResponseRunActivity</string>
     <string name="title_activity_help_fragment">HelpFragment</string>
@@ -57,4 +57,6 @@
     <string name="cancel">Cancel</string>
     <string name="cont">Continue</string>
 
+    <string name="send_loss_push"> completed your challenge and beat your time! Looks like you\'ll have to work harder!</string>
+    <string name="send_win_push"> completed your challenge lost to you! Congratulations!</string>
 </resources>

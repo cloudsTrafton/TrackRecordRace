@@ -1,15 +1,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:theme="@style/MyMaterialTheme"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context="com.seniorproject.trafton.trackrecordrace.MyRunsFragment">
+    <RelativeLayout
+        android:id="@+id/layout_text_challenge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/fetching_runs_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fetching Your Runs..."
+            android:layout_margin="10sp"
+            />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/MyRunsCardList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:isScrollContainer="true"
+            />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome to your stats"
-        android:textSize="40dp"
-        android:textStyle="bold"
-        android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
 
 </RelativeLayout>

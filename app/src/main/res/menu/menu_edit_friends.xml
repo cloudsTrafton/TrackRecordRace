@@ -2,10 +2,17 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.seniorproject.trafton.trackrecordrace.EditFriendsActivity">
+
       <item
           android:id="@+id/action_add_friends"
           android:icon="@drawable/ic_person_add_white_24dp"
           android:title="Add friend"
           android:orderInCategory="100"
           app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_delete_friends"
+        android:icon="@drawable/ic_person_delete_white_24dp"
+        android:title="Delete friend"
+        android:orderInCategory="100"
+        app:showAsAction="always"/>
 </menu>

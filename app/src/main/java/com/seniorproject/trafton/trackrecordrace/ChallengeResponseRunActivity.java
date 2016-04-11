@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,13 +21,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ChallengeResponseRunActivity extends AppCompatActivity implements LocationProvider.LocationCallback {
 
@@ -38,6 +46,8 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     protected Double challengeTimeNum;
     protected TextView mDistanceHackText;
     protected TextView mTimeHackText;
+    protected String challengerName;
+    protected ParseUser challenger;
     protected boolean win;
 
     /*Regular old running variables*/
@@ -102,6 +112,8 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         /*-------RECIEVE DATA FROM INTENT---------------------*/
         setContentView(R.layout.activity_challenge_response_run);
         Intent intent = getIntent();
+        challengerName = intent.getStringExtra(ParseConstants.BUNDLE_CHALLENGER);
+
         challengeDistance = intent.getStringExtra(ParseConstants.BUNDLE_DISTANCE);
         challengeDistanceNum = Double.parseDouble(challengeDistance);
 
@@ -123,7 +135,9 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         mRunCalsText = (TextView) findViewById(R.id.run_kcals_text);
 
         Toolbar runToolbar= (Toolbar) findViewById(R.id.toolbar_run);
-        runToolbar.setTitle("Run on " + getDate());
+        runToolbar.setTitle("Challenge with " + challengerName);
+        runToolbar.setSubtitle(getDate());
+        runToolbar.setSubtitleTextColor(Color.WHITE);
         runToolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(runToolbar);
     }
@@ -331,15 +345,77 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         if(seconds/60 < challengeTimeNum){
             win = true;
             mCurrentUser.put(ParseConstants.KEY_USER_WINS, wins + 1);
-            //mCurrentUser.save();
+            saveToParse(mCurrentUser);
+            queryChallenger(challengerName, win);
         }
         else {
             win = false;
             mCurrentUser.put(ParseConstants.KEY_USER_LOSSES,losses+1);
-            //mCurrentUser.save();
-            //add a new loss to their stats
+            saveToParse(mCurrentUser);
+            queryChallenger(challengerName, win);
         }
 
     }
-    /*-----END ONLY FOR NON-CHALLENGE RUNS------------*/
+
+    /*Get the challenger*/
+    public void queryChallenger(String challengerUsername, boolean currentUserWin){
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("username", challengerUsername);
+        query.findInBackground(new FindCallback<ParseUser>() {
+            public void done(List<ParseUser> users, ParseException e) {
+                if (e == null) {
+                    /*Check for the length of the array. There should only be one result if there was indeed a match.*/
+                    if (users.size() == 1) {
+                        challenger =  users.get(0);
+                    }
+                    /*If there was no username returned*/
+                    else if (users.size() == 0) {
+                        Toast.makeText(getApplicationContext(), "Challenger not found", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                // Something went wrong with the query
+                else {
+                    Toast.makeText(getApplicationContext(), "Something went wrong with your query :(", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        /*End query, begin logic*/
+        Double chal_losses = challenger.getDouble(ParseConstants.KEY_USER_LOSSES);
+        Double chal_wins = challenger.getDouble(ParseConstants.KEY_USER_WINS);
+        if(currentUserWin){
+            challenger.put(ParseConstants.KEY_USER_LOSSES, chal_losses + 1);
+            sendPushNotification(challenger,mCurrentUser,getResources().getString(R.string.send_loss_push));
+        }
+        else if(!currentUserWin){
+            challenger.put(ParseConstants.KEY_USER_WINS, chal_wins + 1);
+            sendPushNotification(challenger, mCurrentUser, getResources().getString(R.string.send_win_push));
+        }
+
+        saveToParse(challenger);
+
+    }
+    //------------------------------
+
+    //Separate method to save to backend
+    public void saveToParse(ParseUser user){
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e("EDITFRIENDS", e.getMessage());
+                }
+            }
+        });
+    }
+    /*-----------------*/
+    protected void sendPushNotification(ParseUser challenger, ParseUser current, String message){
+        ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
+        query.whereEqualTo(ParseConstants.KEY_USER_ID, challenger.getObjectId());
+
+        ParsePush push = new ParsePush();
+        push.setQuery(query);
+        push.setMessage(current.getUsername() + message);
+        push.sendInBackground();
+
+    }
 }
