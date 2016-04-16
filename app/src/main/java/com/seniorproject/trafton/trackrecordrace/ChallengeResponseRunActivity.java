@@ -1,5 +1,7 @@
 package com.seniorproject.trafton.trackrecordrace;
 
+/*This is where users will respond to challenges and also where winners and losers are determined*/
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -49,6 +51,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     protected String challengerName;
     protected ParseUser challenger;
     protected boolean win;
+    protected TimeFormatter mTimeFormatter = new TimeFormatter();
 
     /*Regular old running variables*/
     private GoogleMap mMap;
@@ -61,7 +64,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     private ArrayList<LatLng> geoPoints = new ArrayList<LatLng>();
     private ArrayList<Double> distances = new ArrayList<Double>();
     private ArrayList<Double> speeds = new ArrayList<Double>();
-    protected DecimalFormat df = new DecimalFormat("#.##");
+    protected DecimalFormat df = new DecimalFormat("##.##");
 
     CalorieCalc calorieCounter = new CalorieCalc(weight);
     protected Double calories = 0.0;
@@ -116,14 +119,16 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
 
         challengeDistance = intent.getStringExtra(ParseConstants.BUNDLE_DISTANCE);
         challengeDistanceNum = Double.parseDouble(challengeDistance);
+        Log.d(TAG, "Challenge distance: " + challengeDistanceNum);
 
         challengeTime = intent.getStringExtra(ParseConstants.BUNDLE_TIME);
         challengeTimeNum = Double.parseDouble(challengeTime);
+        Log.d(TAG, "Challenge Time: " + challengeTimeNum);
 
         mDistanceHackText = (TextView) findViewById(R.id.chal_disthack);
-        mDistanceHackText.setText(challengeDistance + " miles");
+        mDistanceHackText.setText(df.format(toMiles(challengeDistanceNum)) + " miles");
         mTimeHackText = (TextView) findViewById(R.id.chal_timehack);
-        mTimeHackText.setText(challengeTime);
+        mTimeHackText.setText(mTimeFormatter.getFormattedString((challengeTimeNum)));
         /*--------END RECIEVE DATA FROM INTENT--------------*/
         setUpMapIfNeeded();
         mLocationProvider = new LocationProvider(this, this);
@@ -263,7 +268,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
 
             /*---------UPDATE VIEWS---------*/
             if(geoPoints.size() > 1){
-                mRunDistText.setText(df.format(getNewDistance()) + " miles");
+                mRunDistText.setText(df.format(toMiles(getNewDistance())) + " miles");
             }
             mRunSpeedText.setText((df.format(currentSpeed)) + " miles/hour");
             if (currentSpeed != 0){
@@ -285,13 +290,13 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
 
     /*-------------------------Get the Metrics----------------------------------------------------*/
 
-    //returns the latest distance between geoPoints. Append to total number. Multiplier returns distance in miles
+    //returns the latest distance between geoPoints. Append to total number
     public Double getNewDistance(){
         float[] results = new float[1];
         LatLng prev = geoPoints.get(geoPoints.size()-2);
         LatLng latest = geoPoints.get(geoPoints.size()-1);
         Location.distanceBetween(prev.latitude, prev.longitude, latest.latitude, latest.longitude, results);
-        Float res = results[0] * 0.000621371192f;
+        Float res = results[0];
         Double dist = res.doubleValue();
         Log.d(TAG, "New distance is: " + dist);
         distances.add(dist);
@@ -306,6 +311,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         }
         if (sum >= challengeDistanceNum){
             finishResponse();
+            Log.d(TAG, "Race is finished!");
         }
         return sum;
     }
@@ -318,6 +324,12 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         mps = mps * 2.23694;
         return mps;
 
+    }
+
+    /*Gets Distance in Miles*/
+    public Double toMiles(Double val){
+        val = val * 0.000621371192f;
+        return val;
     }
     /*-------------------------Get the Metrics----------------------------------------------------*/
 
@@ -339,10 +351,12 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         }
     }
 
-    /*TODO: FINISH LOGIC HERE, SAVE THAT SHIT, SEND PUSH NOTIFICATION */
+    /*When the user finishes, do all of the logic here  */
     public void finishResponse(){
         isRunning = false;
-        if(seconds/60 < challengeTimeNum){
+        Log.d(TAG,"Seconds ran here: " + seconds);
+        Log.d(TAG, "Challenger's time: " + challengeTimeNum);
+        if(seconds < challengeTimeNum){
             win = true;
             mCurrentUser.put(ParseConstants.KEY_USER_WINS, wins + 1);
             saveToParse(mCurrentUser);
@@ -383,10 +397,14 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         Double chal_losses = challenger.getDouble(ParseConstants.KEY_USER_LOSSES);
         Double chal_wins = challenger.getDouble(ParseConstants.KEY_USER_WINS);
         if(currentUserWin){
+            Log.d(TAG, "Current user wins");
+            Toast.makeText(getApplicationContext(), "YOU WIN", Toast.LENGTH_SHORT).show();
             challenger.put(ParseConstants.KEY_USER_LOSSES, chal_losses + 1);
             sendPushNotification(challenger,mCurrentUser,getResources().getString(R.string.send_loss_push));
         }
         else if(!currentUserWin){
+            Log.d(TAG, "Challenger user wins");
+            Toast.makeText(getApplicationContext(), "YOU LOSE", Toast.LENGTH_SHORT).show();
             challenger.put(ParseConstants.KEY_USER_WINS, chal_wins + 1);
             sendPushNotification(challenger, mCurrentUser, getResources().getString(R.string.send_win_push));
         }
@@ -408,6 +426,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         });
     }
     /*-----------------*/
+    /*Sends out a push to the challenger that they have won or lost*/
     protected void sendPushNotification(ParseUser challenger, ParseUser current, String message){
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
         query.whereEqualTo(ParseConstants.KEY_USER_ID, challenger.getObjectId());

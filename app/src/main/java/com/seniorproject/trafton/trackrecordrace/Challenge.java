@@ -23,16 +23,17 @@ public class Challenge extends ParseObject{
     }
 
     /*Constructor used to create a new challenge in the database*/
-    public Challenge(ParseUser chal, double chal_time, ParseUser con, double con_time){
+    public Challenge(ParseUser chal, double chal_time, double dist, ParseUser con, double con_time){
         challenger = chal;
         this.put("Challenger", challenger);
         chalTime = chal_time;
         this.put("ChallengerTime",chalTime);
+        distance = dist;
+        this.put("Distance", distance);
         contender = con;
         this.put("Contender",contender);
         conTime = con_time;
         this.put("ContenderTime", conTime);
-        this.put("Distance", 00.00);
 
     }
 

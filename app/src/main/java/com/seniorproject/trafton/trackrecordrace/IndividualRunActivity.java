@@ -241,7 +241,7 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
 
             /*---------UPDATE VIEWS---------*/
             if(geoPoints.size() > 1){
-                mRunDistText.setText(df.format(getNewDistance()) + " miles");
+                mRunDistText.setText(df.format(toMiles(getNewDistance())) + " miles");
             }
             mRunSpeedText.setText((df.format(currentSpeed)) + " miles/hour");
             if (currentSpeed != 0){
@@ -264,13 +264,13 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
 
     /*-------------------------Get the Metrics----------------------------------------------------*/
 
-    //returns the latest distance between geoPoints. Append to total number. Multiplier returns distance in miles
+    //returns the latest distance between geoPoints. Append to total number.
     public Double getNewDistance(){
         float[] results = new float[1];
         LatLng prev = geoPoints.get(geoPoints.size()-2);
         LatLng latest = geoPoints.get(geoPoints.size()-1);
         Location.distanceBetween(prev.latitude, prev.longitude, latest.latitude, latest.longitude, results);
-        Float res = results[0] * 0.000621371192f;
+        Float res = results[0];
         Double dist = res.doubleValue();
         Log.d(TAG, "New distance is: " + dist);
         distances.add(dist);
@@ -298,6 +298,12 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
         mps = mps * 2.23694;
         return mps;
 
+    }
+
+    /*Gets Distance in Miles*/
+    public Double toMiles(Double val){
+        val = val * 0.000621371192f;
+        return val;
     }
     /*-------------------------Get the Metrics----------------------------------------------------*/
 

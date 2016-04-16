@@ -1,9 +1,14 @@
 package com.seniorproject.trafton.trackrecordrace;
 
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class HelpActivity extends AppCompatActivity {
 
@@ -11,6 +16,24 @@ public class HelpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
+
+        Toolbar helpToolbar= (Toolbar) findViewById(R.id.toolbar_activity_help);
+        helpToolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(helpToolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_white_24dp);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        helpToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+        /* Wire up widgets */
+
     }
 
     @Override
@@ -19,6 +42,7 @@ public class HelpActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_help, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

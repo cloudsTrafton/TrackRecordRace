@@ -9,6 +9,10 @@ public class ParseConstants {
     public static final String KEY_SELF_CONTENDER = "Contender";
     public static final String KEY_SELF_CHALLENGER = "Challenger";
 
+    public static final String KEY_SELF_OWNER = "Owner";
+
+    /*Individual Runs*/
+
     /*Intent keys*/
     public static final String BUNDLE_DISTANCE = "DISTANCE";
     public static final String BUNDLE_TIME = "TIME";

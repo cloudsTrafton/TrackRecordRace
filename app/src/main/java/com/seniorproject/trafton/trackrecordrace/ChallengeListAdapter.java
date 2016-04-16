@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -68,15 +69,18 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdap
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
+        TimeFormatter mTimeFormatter = new TimeFormatter();
+        DecimalFormat df = new DecimalFormat("#.##");
 
         viewHolder.titleText.setText(" Challenge sent by " + itemsData.get(position).getChallenger().getUsername() + " on " + itemsData.get(position).getCreatedOn());
-        viewHolder.distanceText.setText("Distance: " + itemsData.get(position).getDistance() + " miles");
-        viewHolder.theirTimeText.setText("Their Time: " + itemsData.get(position).getChalTime() + " mins");
+        viewHolder.distanceText.setText("Distance: " +  df.format(mTimeFormatter.toMiles(itemsData.get(position).getDistance())) + " miles");
+        viewHolder.theirTimeText.setText("Their Time: " + mTimeFormatter.getFormattedString(itemsData.get(position).getChalTime()) + " mins");
 
-        /*Get the metrics for clicking the buttons!*/
-        final String distIntent = viewHolder.distanceText.getText().toString().replaceAll("[^\\d.]", "");
+        /*Get the metrics for clicking the buttons!
+        * All data is sent in meters and seconds for consistency and is then converted for aesthetics*/
+        final Double distIntent = itemsData.get(position).getDistance();
         Log.d("CHALLENGEADAPTER", "sending: " + distIntent);
-        final String timeIntent = viewHolder.theirTimeText.getText().toString().replaceAll("[^\\d.]", "");
+        final Double timeIntent = itemsData.get(position).getChalTime();
         Log.d("CHALLENGEADAPTER", "sending: " + timeIntent);
         final String challengerName = itemsData.get(position).getChallenger().getUsername();
         Log.d("CHALLENGEADAPTER", "sending: " + challengerName);
@@ -89,8 +93,8 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdap
                 Log.d("CHALLENGEADAPTER", "send button was clicked!");
                 //TODO:When the button is clicked, sent a bundle of data in an intent
                 Intent intent = new Intent(v.getContext(), ChallengeResponseRunActivity.class);
-                intent.putExtra(ParseConstants.BUNDLE_DISTANCE, distIntent);
-                intent.putExtra(ParseConstants.BUNDLE_TIME, timeIntent);
+                intent.putExtra(ParseConstants.BUNDLE_DISTANCE, distIntent.toString());
+                intent.putExtra(ParseConstants.BUNDLE_TIME, timeIntent.toString());
                 intent.putExtra(ParseConstants.BUNDLE_CHALLENGER,challengerName);
                 v.getContext().startActivity(intent);
             }

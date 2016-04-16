@@ -1,7 +1,11 @@
 package com.seniorproject.trafton.trackrecordrace;
 
 import com.parse.ParseClassName;
-import com.parse.*;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+
+import java.util.Date;
+
 /**
  * Created by Claudia on 3/29/16.
  * Registered class for storing runs in Parse
@@ -13,6 +17,8 @@ public class Run extends ParseObject{
     Double distance;
     Double time;
     Double calories;
+
+    private Date createdOn;
 
     /*Required default constructor*/
     public Run(){
@@ -33,6 +39,16 @@ public class Run extends ParseObject{
         this.put("Calories",calories);
     }
 
+    //Load Constructor
+    public Run(ParseUser o, Double d, Double t, Double c, Date date){
+        owner = o;
+        distance = d;
+        time = t;
+        calories = c;
+        createdOn = date;
+
+    }
+
     /*Getters*/
     public Double getDistance() {
         return distance;
@@ -44,6 +60,10 @@ public class Run extends ParseObject{
 
     public Double getCalories() {
         return calories;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
     }
 
     /*Setters*/
@@ -58,6 +78,7 @@ public class Run extends ParseObject{
     public void setCalories(Double cals) {
         this.calories = cals;
     }
+
 
 
 }

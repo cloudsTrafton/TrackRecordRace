@@ -81,8 +81,9 @@ public class MainTabsActivity extends AppCompatActivity {
                 startActivity(friendsIntent);
                 return true;
             case R.id.action_settings:
-                //Go to settings activity
-                //Move edit friends activity to here
+                Intent settingsIntent = new Intent(MainTabsActivity.this,
+                        SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
             case R.id.action_help:
                 Intent helpIntent = new Intent(MainTabsActivity.this,

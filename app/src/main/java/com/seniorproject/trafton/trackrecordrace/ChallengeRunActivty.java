@@ -269,7 +269,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
             /*---------UPDATE VIEWS---------*/
             if(geoPoints.size() > 1){
-                mRunDistText.setText(df.format(getNewDistance()) + " miles");
+                mRunDistText.setText(df.format(toMiles(getNewDistance())) + " miles");
             }
             mRunSpeedText.setText((df.format(currentSpeed)) + " miles/hour");
             if (currentSpeed != 0){
@@ -291,13 +291,13 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
 
     /*-------------------------Get the Metrics----------------------------------------------------*/
 
-    //returns the latest distance between geoPoints. Append to total number. Multiplier returns distance in miles
+    //returns the latest distance between geoPoints. Append to total number.
     public Double getNewDistance(){
         float[] results = new float[1];
         LatLng prev = geoPoints.get(geoPoints.size()-2);
         LatLng latest = geoPoints.get(geoPoints.size()-1);
         Location.distanceBetween(prev.latitude, prev.longitude, latest.latitude, latest.longitude, results);
-        Float res = results[0] * 0.000621371192f;
+        Float res = results[0];
         Double dist = res.doubleValue();
         Log.d(TAG, "New distance is: " + dist);
         distances.add(dist);
@@ -322,6 +322,13 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
         return mps;
 
     }
+
+    /*Gets Distance in Miles*/
+    public Double toMiles(Double val){
+        val = val * 0.000621371192f;
+        return val;
+    }
+
     /*-------------------------Get the Metrics----------------------------------------------------*/
 
     //get today's date in a simple format
@@ -365,9 +372,8 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                 ListView lw = ((AlertDialog)dialog).getListView();
                 int pos = lw.getCheckedItemPosition();
                 Log.d(TAG, "item selected: " + pos);
-
-                Challenge chal = new Challenge(mCurrentUser,0,mFriends.get(pos),0);
-                //TODO: chal.setDistance(distanceRan);
+                Challenge chal = new Challenge(mCurrentUser,seconds,calcDistance(),mFriends.get(pos),0);
+                Log.d(TAG,"Distance sent: " + calcDistance());
                 final ParseUser contender = mFriends.get(pos);
                 chal.saveInBackground(new SaveCallback() {
                     @Override
