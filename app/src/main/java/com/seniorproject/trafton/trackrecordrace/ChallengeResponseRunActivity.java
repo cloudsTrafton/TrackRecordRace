@@ -360,6 +360,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
             win = true;
             mCurrentUser.put(ParseConstants.KEY_USER_WINS, wins + 1);
             saveToParse(mCurrentUser);
+            Log.d(TAG,"Looking for: " + challengerName);
             queryChallenger(challengerName, win);
         }
         else {
@@ -372,15 +373,45 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     }
 
     /*Get the challenger*/
-    public void queryChallenger(String challengerUsername, boolean currentUserWin){
+    public void queryChallenger(String challengerUsername, final boolean currentUserWin){
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereEqualTo("username", challengerUsername);
+        //query.include(ParseConstants.KEY_USER_LOSSES);
+        //query.include(ParseConstants.KEY_USER_WINS);
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> users, ParseException e) {
                 if (e == null) {
+                    Log.d(TAG, "Successful Query");
                     /*Check for the length of the array. There should only be one result if there was indeed a match.*/
                     if (users.size() == 1) {
-                        challenger =  users.get(0);
+                        challenger = users.get(0);
+                        Log.d(TAG, "Challenger: " + challenger.getUsername());
+
+                        /*------------------------------ */
+                                /*End query, begin logic*/
+                        Number chal_losses = challenger.getNumber(ParseConstants.KEY_USER_LOSSES);
+                        Number chal_wins = challenger.getNumber(ParseConstants.KEY_USER_WINS);
+                        if (currentUserWin) {
+                            Log.d(TAG, "Current user wins");
+                            Toast.makeText(getApplicationContext(), "YOU WIN", Toast.LENGTH_SHORT).show();
+                            //Update challenger's losses
+                            challenger.put(ParseConstants.KEY_USER_LOSSES, chal_losses.intValue() + 1);
+                            saveToParse(challenger);
+                            sendPushNotification(challenger, mCurrentUser, getResources().getString(R.string.send_loss_push));
+
+                            //test push
+                            sendPushNotification(mCurrentUser,mCurrentUser,getResources().getString(R.string.send_loss_push));
+
+                        } else if (!currentUserWin) {
+                            Log.d(TAG, "Challenger user wins");
+                            Toast.makeText(getApplicationContext(), "YOU LOSE", Toast.LENGTH_SHORT).show();
+                            //update challenger's wins
+                            challenger.put(ParseConstants.KEY_USER_WINS, chal_wins.intValue() + 1);
+                            saveToParse(challenger);
+                            sendPushNotification(challenger, mCurrentUser, getResources().getString(R.string.send_win_push));
+                        }
+
+                        /*----------------------------*/
                     }
                     /*If there was no username returned*/
                     else if (users.size() == 0) {
@@ -389,38 +420,26 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
                 }
                 // Something went wrong with the query
                 else {
+                    Log.d(TAG, "Something is wrong with the query");
+                    Log.d(TAG, e.getMessage());
                     Toast.makeText(getApplicationContext(), "Something went wrong with your query :(", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        /*End query, begin logic*/
-        Double chal_losses = challenger.getDouble(ParseConstants.KEY_USER_LOSSES);
-        Double chal_wins = challenger.getDouble(ParseConstants.KEY_USER_WINS);
-        if(currentUserWin){
-            Log.d(TAG, "Current user wins");
-            Toast.makeText(getApplicationContext(), "YOU WIN", Toast.LENGTH_SHORT).show();
-            challenger.put(ParseConstants.KEY_USER_LOSSES, chal_losses + 1);
-            sendPushNotification(challenger,mCurrentUser,getResources().getString(R.string.send_loss_push));
-        }
-        else if(!currentUserWin){
-            Log.d(TAG, "Challenger user wins");
-            Toast.makeText(getApplicationContext(), "YOU LOSE", Toast.LENGTH_SHORT).show();
-            challenger.put(ParseConstants.KEY_USER_WINS, chal_wins + 1);
-            sendPushNotification(challenger, mCurrentUser, getResources().getString(R.string.send_win_push));
-        }
-
-        saveToParse(challenger);
 
     }
     //------------------------------
 
     //Separate method to save to backend
-    public void saveToParse(ParseUser user){
+    public void saveToParse(final ParseUser user){
         user.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e != null) {
-                    Log.e("EDITFRIENDS", e.getMessage());
+                if (e == null){
+                    Log.d("EDITFRIENDS", user.getUsername() + " was saved successfully");
+                }
+                else if (e != null) {
+                    Log.d("EDITFRIENDS", e.getMessage());
                 }
             }
         });

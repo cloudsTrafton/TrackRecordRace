@@ -315,7 +315,7 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
         return todaysDate;
     }
 
-    /*THIS METHOD IS ONLY FOR THE NON-CHALLENGE RUNS */
+    /*THIS METHOD IS ONLY FOR THE NON-CHALLENGE RUNS.  */
     protected void saveRun(){
         Run run = new Run(mCurrentUser,calcDistance(),seconds/1.0,calories);
         run.saveInBackground(new SaveCallback() {

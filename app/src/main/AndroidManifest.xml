@@ -110,10 +110,6 @@
             android:resource="@mipmap/ic_launcher" />
 
         <activity
-            android:name=".ChallengeFlowActivity"
-            android:label="@string/title_activity_challenge_flow" >
-        </activity>
-        <activity
             android:name=".EditFriendsActivity"
             android:label="@string/title_activity_edit_friends"
             android:parentActivityName=".MainTabsActivity"
