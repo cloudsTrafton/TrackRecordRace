@@ -81,7 +81,7 @@ public class ChallengeFragment extends Fragment {
     * The challenges they have sent will be viewable in "statistics"*/
     public void getChallenges(){
         ParseQuery innerQuery = new ParseQuery("_User");
-        innerQuery.whereEqualTo("username",mCurrentUser.getUsername());
+        innerQuery.whereEqualTo("username", mCurrentUser.getUsername());
         ParseQuery query = new ParseQuery("Challenge");
         query.whereMatchesQuery(ParseConstants.KEY_SELF_CONTENDER, innerQuery);
         query.include("Challenger");
@@ -101,10 +101,16 @@ public class ChallengeFragment extends Fragment {
                             ParseUser contender = (ParseUser) item.get("Contender");
                             double chalTime = castInt((Number) item.get("ChallengerTime"));
                             double distance = castInt((Number) item.get("Distance"));
+                            boolean isComplete = (boolean) item.get("isComplete");
+                            String ID = item.getObjectId();
+                            Log.d(TAG,"Challenge ID: " + ID);
                             Date createdAt = (Date) item.getCreatedAt();
                             Log.d(TAG, "Challenger: " + challenger.getUsername());
                             Challenge temp = new Challenge(challenger, chalTime, contender, distance, createdAt);
-                            mChallenges.add(temp);
+                            temp.setChallengeID(ID);
+                            if (!isComplete) {
+                                mChallenges.add(temp);
+                            }
                         }
 
                     }

@@ -45,6 +45,16 @@
         android:layout_alignParentLeft="true" />
 
     <TextView
+        android:id="@+id/current_weight"
+        android:text="Current weight: 155 lbs"
+        android:layout_below="@id/runs_distance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_alignParentLeft="true"/>
+
+
+    <TextView
         android:id="@+id/challenge_stuff_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,7 +63,7 @@
         android:textColor="@android:color/white"
         android:padding="10dp"
         android:background="@color/colorPrimary"
-        android:layout_below="@id/runs_distance"
+        android:layout_below="@id/current_weight"
         android:layout_alignParentLeft="true" />
     <TextView
         android:id="@+id/challenge_wins"

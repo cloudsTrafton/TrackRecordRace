@@ -161,6 +161,12 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
 
     /*---------- */
     @Override
+    protected void onStart(){
+        super.onStart();
+        mLocationProvider.connect();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();

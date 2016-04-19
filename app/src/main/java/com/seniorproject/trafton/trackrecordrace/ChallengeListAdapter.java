@@ -84,6 +84,8 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdap
         Log.d("CHALLENGEADAPTER", "sending: " + timeIntent);
         final String challengerName = itemsData.get(position).getChallenger().getUsername();
         Log.d("CHALLENGEADAPTER", "sending: " + challengerName);
+        final String challengeID = itemsData.get(position).getID();
+        Log.d("CHALLENGEADAPTER", "sending Challenge ID: " + challengeID);
 
 
         /*Checks for a button click*/
@@ -95,7 +97,8 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdap
                 Intent intent = new Intent(v.getContext(), ChallengeResponseRunActivity.class);
                 intent.putExtra(ParseConstants.BUNDLE_DISTANCE, distIntent.toString());
                 intent.putExtra(ParseConstants.BUNDLE_TIME, timeIntent.toString());
-                intent.putExtra(ParseConstants.BUNDLE_CHALLENGER,challengerName);
+                intent.putExtra(ParseConstants.BUNDLE_CHALLENGER, challengerName);
+                intent.putExtra(ParseConstants.BUNDLE_ID, challengeID);
                 v.getContext().startActivity(intent);
             }
         });

@@ -64,24 +64,26 @@ public class ProfileFragment extends Fragment {
                     mRunsView.setText("Number of Runs: " + numRuns);
 
                     //get distances and sort
-                    for(int i = 0; i < numRuns; i++){
-                        mDistances.add(objects.get(i).getDouble("Distance"));
-                        mPaces.add(objects.get(i).getDouble("Distance")-objects.get(i).getDouble("Time"));
-                    }
-                    Collections.sort(mDistances);
-                    Collections.sort(mPaces);
-
-                    TextView mRunsLongest = (TextView) rootView.findViewById(R.id.runs_distance);
-                    mRunsLongest.setText("Longest Distance: " + mDistances.get(mDistances.size()-1) + " miles");
-
-                    TextView mRunsBestPace = (TextView) rootView.findViewById(R.id.runs_time);
-                    mRunsBestPace.setText("Best Pace: " + mPaces.get(mPaces.size() - 1) + " miles/minute");
-
-                    TextView mChallengeWins = (TextView) rootView.findViewById(R.id.challenge_wins);
-                    mChallengeWins.setText("Wins: " + mCurrentUser.getInt("wins"));
 
                     if (objects.size() == 0) {
-                        //Display a message saying you have no challenges at this time
+                        //Do nothing
+                    }
+                    else {
+                        for (int i = 0; i < numRuns; i++) {
+                            mDistances.add(objects.get(i).getDouble("Distance"));
+                            mPaces.add(objects.get(i).getDouble("Distance") - objects.get(i).getDouble("Time"));
+                        }
+                        Collections.sort(mDistances);
+                        Collections.sort(mPaces);
+
+                        TextView mRunsLongest = (TextView) rootView.findViewById(R.id.runs_distance);
+                        mRunsLongest.setText("Longest Distance: " + mDistances.get(mDistances.size() - 1) + " miles");
+
+                        TextView mRunsBestPace = (TextView) rootView.findViewById(R.id.runs_time);
+                        mRunsBestPace.setText("Best Pace: " + mPaces.get(mPaces.size() - 1) + " miles/minute");
+
+                        TextView mChallengeWins = (TextView) rootView.findViewById(R.id.challenge_wins);
+                        mChallengeWins.setText("Wins: " + mCurrentUser.getInt("wins"));
                     }
                 }
             }
@@ -126,6 +128,8 @@ public class ProfileFragment extends Fragment {
         TextView myChallengesLabel = (TextView) rootView.findViewById(R.id.challenge_stuff_label);
         myChallengesLabel.setText(mUsername + "'s" + " Challenge Stats");
 
+        TextView myCurrentWeight = (TextView) rootView.findViewById(R.id.current_weight);
+        myCurrentWeight.setText("Current Weight: " + mCurrentUser.getNumber("weight"));
 
         return rootView;
     }

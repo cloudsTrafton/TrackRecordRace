@@ -372,7 +372,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                 ListView lw = ((AlertDialog)dialog).getListView();
                 int pos = lw.getCheckedItemPosition();
                 Log.d(TAG, "item selected: " + pos);
-                Challenge chal = new Challenge(mCurrentUser,seconds,calcDistance(),mFriends.get(pos),0);
+                final Challenge chal = new Challenge(mCurrentUser,seconds,calcDistance(),mFriends.get(pos),0);
                 Log.d(TAG,"Distance sent: " + calcDistance());
                 final ParseUser contender = mFriends.get(pos);
                 chal.saveInBackground(new SaveCallback() {
@@ -381,6 +381,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                         if (e != null) {
                             Log.d(TAG, e.toString());
                         } else {
+                            chal.setChallengeID(chal.getObjectId());
                             Log.d(TAG, "saved");
                             Log.d("PUSH", "Push send to: " + contender.getUsername());
                             sendPushNotification(contender, mCurrentUser);

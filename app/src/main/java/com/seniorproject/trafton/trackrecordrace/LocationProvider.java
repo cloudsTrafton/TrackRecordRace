@@ -4,6 +4,7 @@ package com.seniorproject.trafton.trackrecordrace;
  * Created by Claudia on 1/8/16.
  * Class that gets and tracks location points
  */
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -53,7 +54,6 @@ public class LocationProvider implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
-
                 .build();
 
         mLocationCallback = callback;
@@ -82,15 +82,23 @@ public class LocationProvider implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(TAG, "Location services connected.");
-
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (location != null) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            mLocationCallback.handleNewLocation(location);
+
+        if (location == null) {
+            //----------------
+
+            //----------------
+             Log.i(TAG, "couldnt get location");
+
+            noLocationEnabledDialog();
+            /*LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            mLocationCallback.handleNewLocation(location); */
         }
         else {
-            Log.i(TAG, "couldnt get location");
-            noLocationEnabledDialog();
+            /* Log.i(TAG, "couldnt get location");
+            noLocationEnabledDialog(); */
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            mLocationCallback.handleNewLocation(location);
         }
     }
 

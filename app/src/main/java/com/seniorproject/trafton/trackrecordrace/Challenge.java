@@ -4,7 +4,11 @@ package com.seniorproject.trafton.trackrecordrace;
  * Created by Claudia on 3/12/16.
  * Creates new rows in Challenge object in Parse database. Also makes for easy access and modularity
  */
-import com.parse.*;
+
+import com.parse.ParseACL;
+import com.parse.ParseClassName;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 import java.util.Date;
 
@@ -16,6 +20,10 @@ public class Challenge extends ParseObject{
     private double conTime;
     private double distance;
     private Date createdOn;
+    private String challengeID;
+
+    private ParseUser winner;
+    private ParseUser loser;
 
     //Requires a default constructor
     public Challenge(){
@@ -34,6 +42,9 @@ public class Challenge extends ParseObject{
         this.put("Contender",contender);
         conTime = con_time;
         this.put("ContenderTime", conTime);
+        ParseACL acl = new ParseACL();
+        acl.setPublicReadAccess(true);
+        acl.setPublicWriteAccess(true);
 
     }
 
@@ -44,9 +55,23 @@ public class Challenge extends ParseObject{
         contender = con;
         distance = dist;
         createdOn = d;
+        //challengeID = this.getObjectId();
 
     }
 
+
+    //Getting winner and loser
+   /* public void setResult(ParseUser winner, ParseUser loser){
+        this.put("winner", winner);
+        Log.d("CHALLENGE", "winner is: " + winner.getUsername());
+        this.put("loser", loser);
+        Log.d("CHALLENGE", "loser is: " + loser.getUsername());
+    }
+
+    //set the completed flag
+    public void setFinished(){
+        this.put("isComplete", true);
+    } */
 
     /*Getters and setters*/
     public ParseUser getChallenger() {
@@ -65,6 +90,10 @@ public class Challenge extends ParseObject{
     public void setChalTime(float chalTime) {
         //this.put("ChallengerTime",chalTime);
         this.chalTime = chalTime;
+    }
+
+    public String getID(){
+        return challengeID;
     }
 
     public ParseUser getContender() {
@@ -93,6 +122,11 @@ public class Challenge extends ParseObject{
 
     public Date getCreatedOn() {
         return createdOn;
+    }
+
+    //set the challenge
+    public void setChallengeID(String id){
+        challengeID = id;
     }
 
 

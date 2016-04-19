@@ -2,12 +2,14 @@ package com.seniorproject.trafton.trackrecordrace;
 
 /*This is where users will respond to challenges and also where winners and losers are determined*/
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -26,6 +28,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
+import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -42,6 +45,8 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
 
     public static final String TAG = "RESPONSERUN";
     /*Challenge Variables*/
+    public String challengeID;
+
     protected String challengeDistance;
     protected Double challengeDistanceNum;
     protected String challengeTime;
@@ -49,7 +54,10 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     protected TextView mDistanceHackText;
     protected TextView mTimeHackText;
     protected String challengerName;
-    protected ParseUser challenger;
+
+    public ParseUser challenger;
+    private ParseObject chal;
+
     protected boolean win;
     protected TimeFormatter mTimeFormatter = new TimeFormatter();
 
@@ -71,6 +79,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     private boolean isRunning = false;
     protected int seconds;
 
+    private Menu menu;
     private TextView mRunTimeText;
     private TextView mRunSpeedText;
     private TextView mRunDistText;
@@ -125,6 +134,10 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         challengeTimeNum = Double.parseDouble(challengeTime);
         Log.d(TAG, "Challenge Time: " + challengeTimeNum);
 
+        //get the ID of the challenge
+        challengeID = intent.getStringExtra(ParseConstants.BUNDLE_ID);
+        Log.d(TAG, "Challenge ID: " + challengeID);
+
         mDistanceHackText = (TextView) findViewById(R.id.chal_disthack);
         mDistanceHackText.setText(df.format(toMiles(challengeDistanceNum)) + " miles");
         mTimeHackText = (TextView) findViewById(R.id.chal_timehack);
@@ -152,6 +165,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         Log.e("XXX", "Menu created");
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_maps_run, menu);
+        this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -176,10 +190,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
                 }
                 return true;
             case R.id.action_stop_run:;
-                //
-                //TODO add this to the individual running portion
-                //saveRun(getNewDistance(),seconds,calories);
-
+                forfeitChallenge();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -341,33 +352,27 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
         return todaysDate;
     }
 
-    /*THIS METHOD IS ONLY FOR RESPONSE RUNS */
+    /*THESE METHODS IS ONLY FOR RESPONSE RUNS */
 
-    /*Displays a dialog if the user tries to stop the run prematurely*/
-    public void stopRun(){
-        isRunning = false;
-        if(calcDistance() < challengeDistanceNum){
-            /*TODO: Display dialog asking if the user would like to quit*/
-        }
-    }
 
     /*When the user finishes, do all of the logic here  */
     public void finishResponse(){
         isRunning = false;
         Log.d(TAG,"Seconds ran here: " + seconds);
         Log.d(TAG, "Challenger's time: " + challengeTimeNum);
+
+        //current user wins
         if(seconds < challengeTimeNum){
             win = true;
-            mCurrentUser.put(ParseConstants.KEY_USER_WINS, wins + 1);
-            saveToParse(mCurrentUser);
-            Log.d(TAG,"Looking for: " + challengerName);
+            Log.d(TAG, "Looking for: " + challengerName);
             queryChallenger(challengerName, win);
+            finish();
         }
+        //current user loses
         else {
             win = false;
-            mCurrentUser.put(ParseConstants.KEY_USER_LOSSES,losses+1);
-            saveToParse(mCurrentUser);
             queryChallenger(challengerName, win);
+            finish();
         }
 
     }
@@ -376,8 +381,6 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     public void queryChallenger(String challengerUsername, final boolean currentUserWin){
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereEqualTo("username", challengerUsername);
-        //query.include(ParseConstants.KEY_USER_LOSSES);
-        //query.include(ParseConstants.KEY_USER_WINS);
         query.findInBackground(new FindCallback<ParseUser>() {
             public void done(List<ParseUser> users, ParseException e) {
                 if (e == null) {
@@ -386,29 +389,19 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
                     if (users.size() == 1) {
                         challenger = users.get(0);
                         Log.d(TAG, "Challenger: " + challenger.getUsername());
-
-                        /*------------------------------ */
-                                /*End query, begin logic*/
-                        Number chal_losses = challenger.getNumber(ParseConstants.KEY_USER_LOSSES);
-                        Number chal_wins = challenger.getNumber(ParseConstants.KEY_USER_WINS);
                         if (currentUserWin) {
                             Log.d(TAG, "Current user wins");
-                            Toast.makeText(getApplicationContext(), "YOU WIN", Toast.LENGTH_SHORT).show();
-                            //Update challenger's losses
-                            challenger.put(ParseConstants.KEY_USER_LOSSES, chal_losses.intValue() + 1);
-                            saveToParse(challenger);
+                            //Toast.makeText(getApplicationContext(), "YOU WIN", Toast.LENGTH_SHORT).show();
+                            assignWinnerLoser(mCurrentUser, challenger);
                             sendPushNotification(challenger, mCurrentUser, getResources().getString(R.string.send_loss_push));
-
-                            //test push
-                            sendPushNotification(mCurrentUser,mCurrentUser,getResources().getString(R.string.send_loss_push));
+                            Toast.makeText(getApplicationContext(),"You won! Congratulations!!",Toast.LENGTH_LONG).show();
 
                         } else if (!currentUserWin) {
                             Log.d(TAG, "Challenger user wins");
-                            Toast.makeText(getApplicationContext(), "YOU LOSE", Toast.LENGTH_SHORT).show();
-                            //update challenger's wins
-                            challenger.put(ParseConstants.KEY_USER_WINS, chal_wins.intValue() + 1);
-                            saveToParse(challenger);
+                            //Toast.makeText(getApplicationContext(), "YOU LOSE", Toast.LENGTH_SHORT).show();
+                            assignWinnerLoser(challenger, mCurrentUser);
                             sendPushNotification(challenger, mCurrentUser, getResources().getString(R.string.send_win_push));
+                            Toast.makeText(getApplicationContext(),"You lost! You'll have to train harder next time!",Toast.LENGTH_LONG).show();
                         }
 
                         /*----------------------------*/
@@ -430,15 +423,66 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     }
     //------------------------------
 
+    //Access the information of the challenge, also declares the challenge complete
+    public void assignWinnerLoser(final ParseUser winner, final ParseUser loser){
+        ParseQuery query = new ParseQuery("Challenge");
+        Log.d("RESPONSERUN", "ID: " + challengeID);
+        query.whereEqualTo("objectId", challengeID);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e == null) {
+                    Integer chalSize = objects.size();
+                    Log.d("RESPONSERUN", "Number chals returned: " + chalSize.toString());
+                    if (objects.size() == 0) {
+                        //Display a message saying you have no challenges at this time
+                        Log.d("RESPONSERUN", "No challenges with this ID");
+                    } else {
+                        chal = objects.get(0);
+                        Log.d("RESPONSERUN",chal.getObjectId());
+                        ParseObject challengeWOD = ParseObject.createWithoutData("Challenge", chal.getObjectId());
+                        challengeWOD.put("isComplete", true);
+                        challengeWOD.put("winner", winner);
+                        challengeWOD.put("loser", loser);
+                        Log.d("RESPONSERUN", "Winner: " + winner.getUsername());
+                        Log.d("RESPONSERUN", "Loser: " + loser.getUsername());
+
+                        challengeWOD.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e !=null){
+                                    Log.d(TAG,e.getMessage());
+                                }
+                                else {
+                                    Log.d(TAG,"Successfully saved challenge");
+                                }
+                            }
+                        });
+
+                    }
+
+                } else {
+                    /*There must have been a problem*/
+                    Log.d("RESPONSERUN", e.toString());
+                }
+
+                //-----------SAVE-------------
+
+                //----------------------------
+            }
+        });
+    }
+
+    //-------------------------------------
+
     //Separate method to save to backend
     public void saveToParse(final ParseUser user){
         user.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e == null){
+                if (e == null) {
                     Log.d("EDITFRIENDS", user.getUsername() + " was saved successfully");
-                }
-                else if (e != null) {
+                } else if (e != null) {
                     Log.d("EDITFRIENDS", e.getMessage());
                 }
             }
@@ -449,11 +493,46 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
     protected void sendPushNotification(ParseUser challenger, ParseUser current, String message){
         ParseQuery<ParseInstallation> query = ParseInstallation.getQuery();
         query.whereEqualTo(ParseConstants.KEY_USER_ID, challenger.getObjectId());
-
         ParsePush push = new ParsePush();
         push.setQuery(query);
         push.setMessage(current.getUsername() + message);
         push.sendInBackground();
 
     }
+
+    //---STOP CHALLENGE------------------
+    public void forfeitChallenge(){
+        /*Pause the run and update the icon to reflect it*/
+        timeSwapBuffer += timeInMillis;
+        timeHandler.removeCallbacks(updateTimerThread);
+        menu.findItem(R.id.action_begin_run).setIcon(R.drawable.ic_play_arrow_white_24dp);
+        isRunning = false;
+
+        AlertDialog.Builder finishedDialog = new AlertDialog.Builder(ChallengeResponseRunActivity.this);
+        finishedDialog.setTitle("Forfeit Challenge?");
+        finishedDialog.setMessage("This will end the challenge and will count as a lose. Are you sure you want to quit?");
+        finishedDialog.setPositiveButton("Forfeit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Complete and record as a loss
+                win = false;
+                queryChallenger(challengerName, win);
+                Toast.makeText(getApplicationContext(),"You have forfeited the challenge.",Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+        finishedDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startTime = SystemClock.uptimeMillis();
+                timeHandler.postDelayed(updateTimerThread, 0);
+                menu.findItem(R.id.action_begin_run).setIcon(R.drawable.ic_pause_white_24dp);
+                isRunning = true;
+            }
+        });
+        finishedDialog.show();
+    }
+    //-----------------------------------
+
+
 }
