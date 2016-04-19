@@ -70,11 +70,13 @@ public class RunListAdapter extends RecyclerView.Adapter<RunListAdapter.ViewHold
         formattedDate = formatter.format(itemsData.get(position).getCreatedOn());
         String formattedTime = mTimeFormatter.getFormattedString(itemsData.get(position).getTime());
 
+        Double pace = itemsData.get(position).getTime()/itemsData.get(position).getDistance();
+        String formattedPace = mTimeFormatter.getFormattedString(pace);
 
         viewHolder.dateTitleText.setText(" " + formattedDate);
         viewHolder.distanceText.setText(df.format(itemsData.get(position).getDistance()) + " miles");
         viewHolder.timeText.setText(formattedTime + " mins");
-        viewHolder.paceText.setText("8:00 mins/mile"); //TODO implement pacing
+        viewHolder.paceText.setText(formattedPace + " mins/mile"); //TODO implement pacing
         viewHolder.caloriesText.setText(df.format(itemsData.get(position).getCalories()) + " calories burned");
 
     }
