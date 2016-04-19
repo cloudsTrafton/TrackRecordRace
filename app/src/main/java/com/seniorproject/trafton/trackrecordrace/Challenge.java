@@ -21,6 +21,7 @@ public class Challenge extends ParseObject{
     private double distance;
     private Date createdOn;
     private String challengeID;
+    private boolean isComplete;
 
     private ParseUser winner;
     private ParseUser loser;
@@ -42,10 +43,12 @@ public class Challenge extends ParseObject{
         this.put("Contender",contender);
         conTime = con_time;
         this.put("ContenderTime", conTime);
-        ParseACL acl = new ParseACL();
-        acl.setPublicReadAccess(true);
-        acl.setPublicWriteAccess(true);
+        this.put("isComplete", false);
 
+        ParseACL permissions = new ParseACL();
+        permissions.setPublicWriteAccess(true);
+        permissions.setPublicReadAccess(true);
+        this.setACL(permissions);
     }
 
     /*Constructor used to load a new challenge into the application*/

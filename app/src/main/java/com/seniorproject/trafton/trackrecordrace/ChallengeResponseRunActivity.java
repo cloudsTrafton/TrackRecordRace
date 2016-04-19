@@ -439,7 +439,7 @@ public class ChallengeResponseRunActivity extends AppCompatActivity implements L
                         Log.d("RESPONSERUN", "No challenges with this ID");
                     } else {
                         chal = objects.get(0);
-                        Log.d("RESPONSERUN",chal.getObjectId());
+                        Log.d("RESPONSERUN", chal.getObjectId());
                         ParseObject challengeWOD = ParseObject.createWithoutData("Challenge", chal.getObjectId());
                         challengeWOD.put("isComplete", true);
                         challengeWOD.put("winner", winner);
