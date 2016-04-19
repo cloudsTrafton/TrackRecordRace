@@ -8,6 +8,9 @@ public class ParseConstants {
     public static final String KEY_USER_ID = "UserID";
     public static final String KEY_SELF_CONTENDER = "Contender";
     public static final String KEY_SELF_CHALLENGER = "Challenger";
+    public static final String KEY_SELF_WINNER = "winner";
+    public static final String KEY_SELF_LOSER = "loser";
+    public static final String KEY_ISCOMPETE = "isComplete";
 
     public static final String KEY_SELF_OWNER = "Owner";
 

@@ -1,6 +1,5 @@
 package com.seniorproject.trafton.trackrecordrace;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -28,7 +26,6 @@ public class ChallengeFragment extends Fragment {
     }
 
     public static final String TAG = "CHALLENGEFRAGMENT";
-    Button mNewChallengeButton;
     ParseUser mCurrentUser = ParseUser.getCurrentUser();
     List<Challenge> mChallenges = new ArrayList<Challenge>();
 
@@ -52,18 +49,6 @@ public class ChallengeFragment extends Fragment {
         /*Create RecyclerViews*/
         mChallengeList = (RecyclerView) rootView.findViewById(R.id.SentChallengeCardList);
         mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-
-
-        mNewChallengeButton = (Button) rootView.findViewById(R.id.new_challenge_button);
-        mNewChallengeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),
-                        ChallengeRunActivty.class);
-                startActivity(intent);
-            }
-        });
-
         return rootView;
     }
 

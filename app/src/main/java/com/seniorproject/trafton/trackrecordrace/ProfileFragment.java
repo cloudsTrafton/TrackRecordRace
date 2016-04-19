@@ -26,9 +26,14 @@ public class ProfileFragment extends Fragment {
     //Get the user data
     ParseUser mCurrentUser = ParseUser.getCurrentUser();
     String mUsername = mCurrentUser.getUsername().toString();
+    ParseObject challenge;
+    int wins = 0;
+    int losses = 0;
+    int pending = 0;
 
     TextView mWinsView;
     TextView mLossesView;
+    TextView mPending;
 
     List<Double> mDistances = new ArrayList<Double>();
     List<Double> mPaces = new ArrayList<Double>();
@@ -38,6 +43,13 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        wins = 0;
+        losses = 0;
+        pending = 0;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,8 +94,6 @@ public class ProfileFragment extends Fragment {
                         TextView mRunsBestPace = (TextView) rootView.findViewById(R.id.runs_time);
                         mRunsBestPace.setText("Best Pace: " + mPaces.get(mPaces.size() - 1) + " miles/minute");
 
-                        TextView mChallengeWins = (TextView) rootView.findViewById(R.id.challenge_wins);
-                        mChallengeWins.setText("Wins: " + mCurrentUser.getInt("wins"));
                     }
                 }
             }
@@ -92,9 +102,8 @@ public class ProfileFragment extends Fragment {
 
         //Begin Query for Challenges
         ParseQuery innerQueryChal = new ParseQuery("_User");
-        innerQueryChal.whereEqualTo("username",mCurrentUser.getUsername());
+        innerQueryChal.whereEqualTo("username", mCurrentUser.getUsername());
         ParseQuery queryChal = new ParseQuery("Challenge");
-        queryChal.whereMatchesQuery(ParseConstants.KEY_SELF_CONTENDER, innerQueryChal);
         queryChal.include("Challenger");
         queryChal.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -105,10 +114,33 @@ public class ProfileFragment extends Fragment {
                     if (objects.size() == 0) {
                         //Display a message saying you have no challenges at this time
                     } else {
-                        /*Parse each object into a readable format*/
+                        /*Parse each object and increment the proper setting*/
                         for (int i = 0; i < objects.size(); i++) {
+                            challenge = objects.get(i);
+                            //For completed challenges:
+                            if (challenge.getBoolean(ParseConstants.KEY_ISCOMPETE) == true){
+                                if (challenge.getParseUser(ParseConstants.KEY_SELF_WINNER) == mCurrentUser){
+                                    wins+=1;
+                                }
+                                else if (challenge.getParseUser(ParseConstants.KEY_SELF_LOSER) == mCurrentUser){
+                                    losses+=1;
+                                }
+                            }
+                            //get pending
+                            else {
+                                if(challenge.getParseUser(ParseConstants.KEY_SELF_CHALLENGER) == mCurrentUser){
+                                    pending+=1;
+                                }
+                            }
 
                         }
+
+                        mWinsView = (TextView) rootView.findViewById(R.id.challenge_wins);
+                        mWinsView.setText("Wins: " + wins);
+                        mWinsView = (TextView) rootView.findViewById(R.id.challenge_losses);
+                        mWinsView.setText("Losses: " + losses);
+                        mWinsView = (TextView) rootView.findViewById(R.id.challenges_pending_profile);
+                        mWinsView.setText("Pending sent Challenges: " + pending);
 
                     }
 

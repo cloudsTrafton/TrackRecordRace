@@ -394,6 +394,7 @@ public class ChallengeRunActivty extends AppCompatActivity implements LocationPr
                 });
                 Log.d(TAG, "Contender is: " + mFriends.get(pos).toString());
                 Toast.makeText(getApplicationContext(), "You have sent a challenge to " + mFriends.get(pos).getUsername() + "!", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
 
