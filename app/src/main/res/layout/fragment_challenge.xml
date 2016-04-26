@@ -25,22 +25,4 @@
 
 
 </RelativeLayout>
-
-
-    <Button
-        android:id="@+id/new_challenge_button"
-        android:layout_margin="10sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/layout_text_challenge"
-        android:text="New Challenge"
-        android:textColor="#ffffff"
-
-        android:layout_centerHorizontal="true"
-        android:backgroundTint="@color/colorPrimary"
-        />
-
-
-
-
 </RelativeLayout>

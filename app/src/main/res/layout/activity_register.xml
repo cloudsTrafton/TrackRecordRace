@@ -49,53 +49,13 @@
         android:inputType="number"
         />
 
-    <TextView
-        android:id="@+id/txtgender"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/weight"
-        android:layout_marginTop="20dp"
-        android:text="Pick your Gender"
-        />
-
-    <LinearLayout
-        android:id="@+id/gender_checkbox_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/txtgender"
-        >
-
-        <CheckBox
-            android:id="@+id/cb_male"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="29dp"
-            android:text=" Male"
-            android:onClick="onCheckboxClicked"
-            />
-
-
-        <CheckBox
-            android:id="@+id/cb_female"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="18dp"
-            android:layout_toRightOf="@+id/cb_male"
-            android:text=" Female"
-            android:onClick="onCheckboxClicked"
-            />
-    </LinearLayout>
 
     <TextView
         android:id="@+id/txtpassword"
         android:layout_marginTop="20dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/gender_checkbox_layout"
+        android:layout_below="@+id/weight"
         android:text="Choose a Password" />
 
     <EditText

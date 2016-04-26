@@ -1,5 +1,6 @@
 package com.seniorproject.trafton.trackrecordrace;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -20,6 +22,7 @@ import com.parse.SaveCallback;
 public class SettingsActivity extends AppCompatActivity {
 
     ParseUser mCurrentUser = ParseUser.getCurrentUser();
+    Context mContext = this;
 
     Button mSaveButton;
     Button mCancelButton;
@@ -64,8 +67,10 @@ public class SettingsActivity extends AppCompatActivity {
                 mWeightText = mWeightChange.getText().toString();
                 Log.d("SETTINGS", "Weight: " + mWeightText);
                 mWeightNum = Integer.parseInt(mWeightText);
-                mCurrentUser.put("weight",mWeightNum);
+                mCurrentUser.put("weight", mWeightNum);
                 saveToParse(mCurrentUser);
+                Toast.makeText(mContext, "Settings successfully saved!\n Please refresh the page for updated information.",Toast.LENGTH_LONG).show();
+                finish();
             }
         });
 
@@ -99,6 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void done(ParseException e) {
                 if (e != null) {
                     Log.e("SETTINGS", e.getMessage());
+
                 }
             }
         });

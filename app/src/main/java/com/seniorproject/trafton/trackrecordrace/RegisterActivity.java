@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -24,15 +23,9 @@ public class RegisterActivity extends AppCompatActivity {
     String weighttxt;
     int weightNum;
 
-    String gender;
-    Boolean genderEntered;
-
     EditText password;
     EditText username;
     EditText weight;
-
-    CheckBox male;
-    CheckBox female;
 
 
     @Override
@@ -45,8 +38,6 @@ public class RegisterActivity extends AppCompatActivity {
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
         weight = (EditText) findViewById(R.id.weight);
-        male = (CheckBox) findViewById(R.id.cb_male);
-        female = (CheckBox) findViewById(R.id.cb_female);
 
         //register button
         registerButton = (Button) findViewById(R.id.register_button);
@@ -72,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 //weight has to be between 0 and 999
                 // Force user to fill up the form
-                if (usernametxt.equals("") && passwordtxt.equals("") && weighttxt.equals("") && weightNum < 0 && genderEntered == false ) {
+                if (usernametxt.equals("") && passwordtxt.equals("") && weighttxt.equals("") && weightNum < 0) {
                     Toast.makeText(getApplicationContext(),
                             "Please complete the sign up form",
                             Toast.LENGTH_LONG).show();
@@ -82,7 +73,6 @@ public class RegisterActivity extends AppCompatActivity {
                     ParseUser user = new ParseUser();
                     user.setUsername(usernametxt);
                     user.put("weight",weightNum);
-                    user.put("genderCode",gender);
                     user.put("wins", 0);
                     user.put("losses", 0);
                     user.setPassword(passwordtxt);
@@ -119,29 +109,4 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    public void onCheckboxClicked(View view){
-        //get checkBox information, only can be clicked. Set the string to the appropriate gender code.
-        if (male.isChecked()){
-            female.setChecked(false);
-            gender = "m";
-            genderEntered = true;
-
-        }
-        else if (female.isChecked()){
-            male.setChecked(false);
-            gender = "f";
-            genderEntered = true;
-        }
-        else {
-            gender = "none";
-            genderEntered = false;
-
-        }
-
-    }
-
-
-
-
-    //-------------------------------------
 }

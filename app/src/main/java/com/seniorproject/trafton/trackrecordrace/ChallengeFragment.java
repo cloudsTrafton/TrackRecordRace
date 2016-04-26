@@ -100,7 +100,7 @@ public class ChallengeFragment extends Fragment {
 
                     }
 
-                    mAdapter = new ChallengeListAdapter(mChallenges);
+                    mAdapter = new ChallengeListAdapter(mChallenges, getContext());
                     mChallengeList.setLayoutManager(mLayoutManager);
                     mChallengeList.setAdapter(mAdapter);
                     Integer size = mChallenges.size();

@@ -46,6 +46,7 @@ public class MyRunsFragment extends Fragment {
         /*Create RecyclerViews*/
         mRunsList = (RecyclerView) rootView.findViewById(R.id.MyRunsCardList);
         mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        getRuns();
         return rootView;
     }
 
@@ -53,8 +54,6 @@ public class MyRunsFragment extends Fragment {
     public void onResume(){
         super.onResume();
         mRuns.clear();
-        getRuns();
-
     }
 
     //Get the runs from the backend

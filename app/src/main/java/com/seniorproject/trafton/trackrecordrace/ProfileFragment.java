@@ -14,6 +14,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,10 @@ public class ProfileFragment extends Fragment {
 
     List<Double> mDistances = new ArrayList<Double>();
     List<Double> mPaces = new ArrayList<Double>();
+
+    TimeFormatter mTimeFormatter = new TimeFormatter();
+    protected DecimalFormat df = new DecimalFormat("#.##");
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,10 +94,10 @@ public class ProfileFragment extends Fragment {
                         Collections.sort(mPaces);
 
                         TextView mRunsLongest = (TextView) rootView.findViewById(R.id.runs_distance);
-                        mRunsLongest.setText("Longest Distance: " + mDistances.get(mDistances.size() - 1) + " miles");
+                        mRunsLongest.setText("Longest Distance: " + df.format(mTimeFormatter.toMiles(mDistances.get(mDistances.size() - 1))) + " miles");
 
                         TextView mRunsBestPace = (TextView) rootView.findViewById(R.id.runs_time);
-                        mRunsBestPace.setText("Best Pace: " + mPaces.get(mPaces.size() - 1) + " miles/minute");
+                        mRunsBestPace.setText("Best Pace: " + mTimeFormatter.getFormattedString(mPaces.get(mPaces.size() - 1)) + " miles/minute");
 
                     }
                 }

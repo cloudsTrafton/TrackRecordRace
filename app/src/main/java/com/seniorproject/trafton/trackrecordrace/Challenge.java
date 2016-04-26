@@ -62,6 +62,10 @@ public class Challenge extends ParseObject{
 
     }
 
+    public void setDone(){
+        this.put("isComplete", true);
+    }
+
 
     //Getting winner and loser
    /* public void setResult(ParseUser winner, ParseUser loser){

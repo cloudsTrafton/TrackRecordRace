@@ -69,12 +69,13 @@ public class RunListAdapter extends RecyclerView.Adapter<RunListAdapter.ViewHold
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         formattedDate = formatter.format(itemsData.get(position).getCreatedOn());
         String formattedTime = mTimeFormatter.getFormattedString(itemsData.get(position).getTime());
+        Double distanceMiles = mTimeFormatter.toMiles(itemsData.get(position).getDistance());
 
-        Double pace = itemsData.get(position).getTime()/itemsData.get(position).getDistance();
+        Double pace = itemsData.get(position).getTime()/distanceMiles;
         String formattedPace = mTimeFormatter.getFormattedString(pace);
 
         viewHolder.dateTitleText.setText(" " + formattedDate);
-        viewHolder.distanceText.setText(df.format(itemsData.get(position).getDistance()) + " miles");
+        viewHolder.distanceText.setText(df.format(distanceMiles) + " miles");
         viewHolder.timeText.setText(formattedTime + " mins");
         viewHolder.paceText.setText(formattedPace + " mins/mile"); //TODO implement pacing
         viewHolder.caloriesText.setText(df.format(itemsData.get(position).getCalories()) + " calories burned");

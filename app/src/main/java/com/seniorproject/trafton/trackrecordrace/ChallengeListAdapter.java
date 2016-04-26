@@ -1,6 +1,7 @@
 package com.seniorproject.trafton.trackrecordrace;
 
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,6 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -20,8 +27,10 @@ import java.util.List;
 public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdapter.ViewHolder> {
     //itemsData contains each challenge
     protected List<Challenge> itemsData;
-    public ChallengeListAdapter(List<Challenge> itemsData) {
+    protected Context mContext;
+    public ChallengeListAdapter(List<Challenge> itemsData, Context context) {
         this.itemsData = itemsData;
+        this.mContext = context;
     }
 
     /*---------------------------- */
@@ -68,7 +77,7 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdap
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         TimeFormatter mTimeFormatter = new TimeFormatter();
         DecimalFormat df = new DecimalFormat("#.##");
 
@@ -108,6 +117,23 @@ public class ChallengeListAdapter extends RecyclerView.Adapter<ChallengeListAdap
             @Override
             public void onClick(View v) {
                 //TODO:When the button is clicked, remove the challenge from Parse, add a loss to the user
+                Log.d("ISTADAPTER","ID: " + challengeID);
+                ParseQuery query = new ParseQuery("Challenge");
+                query.whereEqualTo("objectId", challengeID);
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> objects, ParseException e) {
+                        if(objects.size()== 0){
+                            Log.d("LISTADAPTER", "No challenges");
+                        }
+                        else {
+                            objects.get(0).deleteInBackground();
+                            Toast.makeText(mContext, "Successfully deleted challenge, please refresh.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                });
+                //-----------------------------
             }
         });
 
