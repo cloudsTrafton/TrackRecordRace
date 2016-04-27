@@ -69,7 +69,7 @@ public class SettingsActivity extends AppCompatActivity {
                 mWeightNum = Integer.parseInt(mWeightText);
                 mCurrentUser.put("weight", mWeightNum);
                 saveToParse(mCurrentUser);
-                Toast.makeText(mContext, "Settings successfully saved!\n Please refresh the page for updated information.",Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "Settings successfully saved!\n Your update will be displayed shortly.",Toast.LENGTH_LONG).show();
                 finish();
             }
         });

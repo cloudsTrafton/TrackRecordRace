@@ -31,6 +31,7 @@ public class ProfileFragment extends Fragment {
     int wins = 0;
     int losses = 0;
     int pending = 0;
+    Number weight = mCurrentUser.getNumber("weight").doubleValue();
 
     TextView mWinsView;
     TextView mLossesView;
@@ -54,6 +55,8 @@ public class ProfileFragment extends Fragment {
         wins = 0;
         losses = 0;
         pending = 0;
+        weight = mCurrentUser.getNumber("weight").doubleValue();
+
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -166,9 +169,13 @@ public class ProfileFragment extends Fragment {
         myChallengesLabel.setText(mUsername + "'s" + " Challenge Stats");
 
         TextView myCurrentWeight = (TextView) rootView.findViewById(R.id.current_weight);
-        myCurrentWeight.setText("Current Weight: " + mCurrentUser.getNumber("weight"));
+        myCurrentWeight.setText("Current Weight: " + weight);
 
         return rootView;
+    }
+
+    public void checkWeight(View v){
+
     }
 
 }

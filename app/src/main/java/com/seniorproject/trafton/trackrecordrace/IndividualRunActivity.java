@@ -286,10 +286,10 @@ public class IndividualRunActivity extends AppCompatActivity implements Location
     //Get the total distance so far
     public Double calcDistance(){
         Double sum = 0.0;
-        if (distances.size() == 0){
-            /*In the future, don't allow the saving of a blank run*/
+        /*In the future, don't allow the saving of a blank run*/
+        /*if (distances.size() == 0){
             return 999.99;
-        }
+        } */
         for(int i = 0; i < distances.size();i++){
             sum+=distances.get(i);
         }

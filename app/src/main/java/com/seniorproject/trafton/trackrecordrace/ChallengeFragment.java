@@ -70,6 +70,7 @@ public class ChallengeFragment extends Fragment {
         ParseQuery query = new ParseQuery("Challenge");
         query.whereMatchesQuery(ParseConstants.KEY_SELF_CONTENDER, innerQuery);
         query.include("Challenger");
+        query.addDescendingOrder("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {

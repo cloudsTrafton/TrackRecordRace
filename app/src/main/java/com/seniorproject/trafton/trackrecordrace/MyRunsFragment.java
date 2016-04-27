@@ -54,6 +54,7 @@ public class MyRunsFragment extends Fragment {
     public void onResume(){
         super.onResume();
         mRuns.clear();
+        getRuns();
     }
 
     //Get the runs from the backend

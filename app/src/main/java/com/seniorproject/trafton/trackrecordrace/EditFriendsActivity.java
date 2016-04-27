@@ -258,10 +258,10 @@ public class EditFriendsActivity extends AppCompatActivity {
                         } else {
                             Log.d("EDITFRIENDS", users.get(0).getUsername());
                             /*Add the user as a friend with the relation*/
-                            Toast.makeText(getApplicationContext(), users.get(0).getUsername() + " is now your friend!", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getApplicationContext(), users.get(0).getUsername() + " is now your friend!", Toast.LENGTH_SHORT).show();
                             mFriendsRelation.add(users.get(0));
                             saveToParse();
-                            Toast.makeText(getApplicationContext(), users.get(0).getUsername() + " is now your friend!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), users.get(0).getUsername() + " is now your friend! Your update will be displayed shortly.", Toast.LENGTH_SHORT).show();
                         }
 
                     }
