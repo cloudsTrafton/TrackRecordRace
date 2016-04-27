@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,13 +29,12 @@ public class SettingsActivity extends AppCompatActivity {
     Button mCancelButton;
 
     EditText mWeightChange;
-    //EditText mIndividualRunsDisplay;
-    //EditText mChallengeDisplay;
+    EditText mIndividualRunsDisplay;
+
 
     String mWeightText;
     Integer mWeightNum;
-    //int mIndividualRunsNum;
-    //int mChallengeNum;
+    Integer mIndividualRunsNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +57,8 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         mWeightChange = (EditText) findViewById(R.id.setting_change_weight);
+        mIndividualRunsDisplay = (EditText) findViewById(R.id.setting_change_individual_runs);
+
         mSaveButton = (Button) findViewById(R.id.save_settings_button);
         mCancelButton = (Button) findViewById(R.id.cancel_settings_button);
 
@@ -64,10 +66,19 @@ public class SettingsActivity extends AppCompatActivity {
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mWeightText = mWeightChange.getText().toString();
-                Log.d("SETTINGS", "Weight: " + mWeightText);
-                mWeightNum = Integer.parseInt(mWeightText);
-                mCurrentUser.put("weight", mWeightNum);
+                if(isUsed(mWeightChange.getText())){
+                    mWeightText = mWeightChange.getText().toString();
+                    Log.d("SETTINGS", "Weight: " + mWeightText);
+                    mWeightNum = Integer.parseInt(mWeightText);
+                    mCurrentUser.put("weight", mWeightNum);
+                }
+
+                if(isUsed(mIndividualRunsDisplay.getText())){
+                    mIndividualRunsNum = Integer.parseInt(mIndividualRunsDisplay.getText().toString());
+                    Log.d("SETTINGS", "display " + mIndividualRunsNum);
+                    mCurrentUser.put("displayNum", mIndividualRunsNum);
+                }
+
                 saveToParse(mCurrentUser);
                 Toast.makeText(mContext, "Settings successfully saved!\n Your update will be displayed shortly.",Toast.LENGTH_LONG).show();
                 finish();
@@ -108,5 +119,15 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public boolean isUsed(Editable viewText){
+        if(viewText.toString().equals("")){
+            return false;
+        }
+        else {
+            return true;
+        }
+
     }
 }

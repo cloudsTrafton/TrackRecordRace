@@ -75,6 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
                     user.put("weight",weightNum);
                     user.put("wins", 0);
                     user.put("losses", 0);
+                    user.put("displayNum",100);
                     user.setPassword(passwordtxt);
 
                     /*Fields that will initially be blank, related to challenges*/

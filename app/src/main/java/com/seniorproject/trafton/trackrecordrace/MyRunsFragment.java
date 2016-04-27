@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -32,6 +33,8 @@ public class MyRunsFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
 
+    protected TextView fetchingRunsLabel;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +46,7 @@ public class MyRunsFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_my_runs, container, false);
 
+        fetchingRunsLabel = (TextView) rootView.findViewById(R.id.fetching_runs_label);
         /*Create RecyclerViews*/
         mRunsList = (RecyclerView) rootView.findViewById(R.id.MyRunsCardList);
         mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
@@ -64,6 +68,7 @@ public class MyRunsFragment extends Fragment {
         ParseQuery query = new ParseQuery("Run");
         query.whereMatchesQuery(ParseConstants.KEY_SELF_OWNER, innerQuery);
         query.include("CreatedAt");
+        query.setLimit(mCurrentUser.getInt("displayNum"));
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
@@ -71,7 +76,7 @@ public class MyRunsFragment extends Fragment {
                     Integer test = objects.size();
                     Log.d(TAG, "Number returned: " + test.toString());
                     if (objects.size() == 0) {
-                        //Display a message saying you have no challenges at this time
+                        fetchingRunsLabel.setText("You haven't completed any runs yet! \n Press the run icon to complete your first run!");
                     } else {
                         /*Parse each object into a readable format*/
                         for (int i = 0; i < objects.size(); i++) {

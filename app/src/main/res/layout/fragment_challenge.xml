@@ -10,10 +10,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <TextView
-        android:id="@+id/losses_challenges"
+        android:id="@+id/challenges_text_display"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fetching Challenges..."
+        android:text="No Challenges at this time"
         android:layout_margin="10sp"
         />
     <android.support.v7.widget.RecyclerView

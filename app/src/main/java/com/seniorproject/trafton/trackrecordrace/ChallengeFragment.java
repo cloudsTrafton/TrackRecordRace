@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -33,6 +34,8 @@ public class ChallengeFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
 
+    protected TextView loadingText;
+
     /*Queries*/
 
     @Override
@@ -47,6 +50,7 @@ public class ChallengeFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_challenge, container, false);
 
         /*Create RecyclerViews*/
+        loadingText = (TextView) rootView.findViewById(R.id.challenges_text_display);
         mChallengeList = (RecyclerView) rootView.findViewById(R.id.SentChallengeCardList);
         mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         return rootView;
@@ -78,7 +82,7 @@ public class ChallengeFragment extends Fragment {
                     Integer test = objects.size();
                     Log.d(TAG, "Number returned: " + test.toString());
                     if (objects.size() == 0) {
-                        //Display a message saying you have no challenges at this time
+                        loadingText.setText("You have no challenges at this time.");
                     } else {
                         /*Parse each object into a readable format*/
                         for (int i = 0; i < objects.size(); i++) {
